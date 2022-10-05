@@ -1,4 +1,4 @@
-###### American plaice stock assessment data GAM work
+###### American plaice stock assessment data GAM work####
 library(pacman)
 pacman::p_load(here, readxl,lubridate,stats,graphics,Hmisc,data.table,utils,mgcv,dplyr,purrr,ecodata) 
 here()
@@ -9,77 +9,62 @@ Bottom_temp_fall<-read.csv(here("data/Friedland_fall_mean_bottom_temp_by_stock.c
 Bottom_temp_spring<-read.csv(here("data/Friedland_spring_mean_bottom_temp_by_stock.csv"))
 Friedland_OISST_fall<-read.csv(here("data/Friedland_OISST_fall.csv"))
 Friedland_OISST_spring<-read.csv(here("data/Friedland_OISST_spr.csv"))
-EGOM_K<-read.csv(here("data/rel_condition/ADIOS_SV_164712_EGOM_NONE_relative_k.csv"))
-WGOM_K<-read.csv(here("data/rel_condition/ADIOS_SV_164712_WGOM_NONE_relative_k.csv"))
-GBK_K<-read.csv(here("data/rel_condition/ADIOS_SV_164712_GBK_NONE_relative_k.csv"))
-SNEMA_K<-read.csv(here("data/rel_condition/ADIOS_SV_164712_SNEMA_NONE_relative_k.csv"))
-#AMO_NAO<-read.csv(here("data/Full_GSI_AMO_NAO.csv"))
-### Reorganize Fulton's K data####
-##fall data
-FultonK_fall<-FultonKOutput[FultonKOutput$source == "NMFS Fall", ]
+##### Get cod heatwave data ####
+cod_heatwave<-as.data.frame(ecodata::ESP_heatwave_cod)
+#EGOM
+EGOM_chw<-cod_heatwave[(cod_heatwave$stock_id == "EGOM") & (cod_heatwave$Var == "cumulative intensity"), ]
+names(EGOM_chw)[3] <- "EGOM_hw"
+EGOM_chw <- EGOM_chw[, -c(2,4:5)]
+#WGOM
+WGOM_chw<-cod_heatwave[(cod_heatwave$stock_id == "WGOM") & (cod_heatwave$Var == "cumulative intensity"), ]
+names(WGOM_chw)[3] <- "WGOM_hw"
+WGOM_chw <- WGOM_chw[, -c(2,4:5)]
+#GB
+GB_chw<-cod_heatwave[(cod_heatwave$stock_id == "GBK") & (cod_heatwave$Var == "cumulative intensity"), ]
+names(GB_chw)[3] <- "GB_hw"
+GB_chw <- GB_chw[, -c(2,4:5)]
+#SNE
+SNE_chw<-cod_heatwave[(cod_heatwave$stock_id == "SNE") & (cod_heatwave$Var == "cumulative intensity"), ]
+names(SNE_chw)[3] <- "SNE_hw"
+SNE_chw <- SNE_chw[, -c(2,4:5)]
 
-FultonK_fall<-aggregate(FultonK~Year+Stock,FultonK_fall,FUN=mean)
+cod_heatwave<-merge(EGOM_chw,WGOM_chw,merge="Time",all=TRUE)
+cod_heatwave<-merge(cod_heatwave,GB_chw,merge="Time",all=TRUE)
+cod_heatwave<-merge(cod_heatwave,SNE_chw,merge="Time",all=TRUE)
 
-EGOM_FK<-FultonK_fall[FultonK_fall$Stock == "Eastern GOM", ]
-names(EGOM_FK)[3] <- "EGOM_FK"
-WGOM_FK<-FultonK_fall[FultonK_fall$Stock == "Western GOM", ]
-names(WGOM_FK)[3] <- "WGOM_FK"
-GB_FK<-FultonK_fall[FultonK_fall$Stock == "Georges Bank", ]
-names(GB_FK)[3] <- "GB_FK"
-
-FultonK_fall <- list(EGOM_FK[,c(1,3)], WGOM_FK[,c(1,3)], GB_FK[,c(1,3)])
-FultonK_fall <-FultonK_fall %>% reduce(full_join, by='Year')
-FultonK_fall$Avg_FK <-rowMeans(FultonK_fall[,c(2:4)],na.rm=TRUE)
-##spring data
-FultonK_spring<-FultonKOutput[FultonKOutput$source == "NMFS Spring", ]
-FultonK_spring<-aggregate(FultonK~Year+Stock,FultonK_spring,FUN=mean)
-
-EGOM_FK<-FultonK_spring[FultonK_spring$Stock == "Eastern GOM", ]
-names(EGOM_FK)[3] <- "EGOM_FK"
-WGOM_FK<-FultonK_spring[FultonK_spring$Stock == "Western GOM", ]
-names(WGOM_FK)[3] <- "WGOM_FK"
-GB_FK<-FultonK_spring[FultonK_spring$Stock == "Georges Bank", ]
-names(GB_FK)[3] <- "GB_FK"
-
-FultonK_spring <- list(EGOM_FK[,c(1,3)], WGOM_FK[,c(1,3)], GB_FK[,c(1,3)])
-FultonK_spring <-FultonK_spring %>% reduce(full_join, by='Year')
-FultonK_spring$Avg_FK <-rowMeans(FultonK_spring[,c(2:4)],na.rm=TRUE)
-### remove data I don't need ####
-rm(EGOM_FK,WGOM_FK,GB_FK,FultonKOutput)
-####Combine data into separate spring and fall data frames####
+cod_heatwave$mean_c_heatwave <- rowMeans(cod_heatwave[,2:5],na.rm=TRUE)
+names(cod_heatwave)[1] <- "Year"
+rm(EGOM_chw,GB_chw,WGOM_chw,SNE_chw)
+####Combine data into separate data frames by season####
 #put all data frames into list
-distribution_fall <- list(Cod_distribution[,c(1,4,5)], annual_GSI, Bottom_temp_fall[,c(1,6)],Friedland_OISST_fall[,c(1,6)],FultonK_fall[,c(1,5)])
+distribution_fall <- list(Cod_distribution[,c(1,4,5)], annual_GSI, Bottom_temp_fall[,c(1,6)],Friedland_OISST_fall[,c(1,6)],cod_heatwave[,c(1,6)])
 #merge all data frames in list
 distribution_fall<-distribution_fall %>% reduce(full_join, by='Year')
 names(distribution_fall)[4] <- "Avg_GSI"
 
-distribution_spring <- list(Cod_distribution[,c(1,2,3)], annual_GSI, Bottom_temp_spring[,c(1,6)],Friedland_OISST_spring[,c(1,6)],FultonK_spring[,c(1,5)])
+distribution_spring <- list(Cod_distribution[,c(1,2,3)], annual_GSI, Bottom_temp_spring[,c(1,6)],Friedland_OISST_spring[,c(1,6)],cod_heatwave[,c(1,6)])
 distribution_spring<-distribution_spring %>% reduce(full_join, by='Year')
 names(distribution_spring)[4] <- "Avg_GSI"
 ### remove data I don't need ####
-rm(annual_GSI)
-rm(Bottom_temp_fall)
-rm(Bottom_temp_spring)
-rm(Friedland_OISST_fall)
-rm(Friedland_OISST_spring)
-rm(FultonK_fall)
-rm(FultonK_spring)
+rm(annual_GSI,Bottom_temp_fall,Bottom_temp_spring,Friedland_OISST_fall,Friedland_OISST_spring,Cod_distribution,cod_heatwave)
+
 ###clip to years with most data###
 distribution_fall = distribution_fall[!distribution_fall$Year > 2019,]
-distribution_fall = distribution_fall[!distribution_fall$Year < 1977,]
+distribution_fall = distribution_fall[!distribution_fall$Year < 1982,]
 distribution_spring = distribution_spring[!distribution_spring$Year > 2019,]
-distribution_spring = distribution_spring[!distribution_spring$Year < 1977,]
+distribution_spring = distribution_spring[!distribution_spring$Year < 1982,]
+
 ###reorder by year###
 distribution_fall<-distribution_fall %>% arrange(Year)
 distribution_spring<-distribution_spring %>% arrange(Year)
 
 ###### Anomaly Base Period########
-### using 1981-2010 as baseline anomaly period as NOAA does####
+### using 1982-2011 as baseline anomaly period####
 
-bt_fall_bp<-mean(distribution_fall[5:34,5])
-bt_spring_bp<-mean(distribution_spring[5:34,5])
-sst_fall_bp<-mean(distribution_fall[5:34,6])
-sst_spring_bp<-mean(distribution_spring[5:34,6])
+bt_fall_bp<-mean(distribution_fall[1:30,5])
+bt_spring_bp<-mean(distribution_spring[1:30,5])
+sst_fall_bp<-mean(distribution_fall[1:30,6])
+sst_spring_bp<-mean(distribution_spring[1:30,6])
 #####
 ##### Calculate temperature anomaly columns#####
 
@@ -91,38 +76,15 @@ distribution_fall$sst_anomaly<- distribution_fall$Avg_oisst  - sst_fall_bp
 distribution_spring$bt_anomaly<- distribution_spring$Avg_bt  - bt_spring_bp
 distribution_spring$sst_anomaly<- distribution_spring$Avg_oisst  - sst_spring_bp
 
-##### Get cod heatwave data ####
-cod_heatwave<-as.data.frame(ecodata::ESP_heatwave_cod)
+###Get final dataframes ####
+distribution_fall<-distribution_fall[,c(1:4,7:9)]
+distribution_spring<-distribution_spring[,c(1:4,7:9)]
 
-EGOM_chw<-cod_heatwave[(cod_heatwave$stock_id == "EGOM") & (cod_heatwave$Var == "cumulative intensity"), ]
-names(EGOM_chw)[3] <- "EGOM_hw"
-EGOM_chw <- EGOM_chw[, -c(2,4:5)]
-WGOM_chw<-cod_heatwave[(cod_heatwave$stock_id == "WGOM") & (cod_heatwave$Var == "cumulative intensity"), ]
-names(WGOM_chw)[3] <- "WGOM_hw"
-WGOM_chw <- WGOM_chw[, -c(2,4:5)]
-GB_chw<-cod_heatwave[(cod_heatwave$stock_id == "GBK") & (cod_heatwave$Var == "cumulative intensity"), ]
-names(GB_chw)[3] <- "GB_hw"
-GB_chw <- GB_chw[, -c(2,4:5)]
-SNE_chw<-cod_heatwave[(cod_heatwave$stock_id == "SNE") & (cod_heatwave$Var == "cumulative intensity"), ]
-names(SNE_chw)[3] <- "SNE_hw"
-SNE_chw <- SNE_chw[, -c(2,4:5)]
+#########################
+############ START ANALYSIS ##################
 
-c_od_heatwave<-merge(EGOM_chw,WGOM_chw,merge="Time",all=TRUE)
-c_od_heatwave<-merge(c_od_heatwave,GB_chw,merge="Time",all=TRUE)
-c_od_heatwave<-merge(c_od_heatwave,SNE_chw,merge="Time",all=TRUE)
 
-c_od_heatwave$mean_c_heatwave <- rowMeans(c_od_heatwave[,2:5],na.rm=TRUE)
-names(c_od_heatwave)[1] <- "Year"
-###### add heatwave, NAO, AMO columns ####
-distribution_fall<-merge(distribution_fall,c_od_heatwave[,c(1,6)],merge="Year",all=TRUE)
-distribution_fall<-merge(distribution_fall,AMO_NAO[30:74,c(1,3:4)],merge="Year",all=TRUE)
-distribution_spring<-merge(distribution_spring,c_od_heatwave[,c(1,6)],merge="Year",all=TRUE)
-distribution_spring<-merge(distribution_spring,AMO_NAO[30:74,c(1,3:4)],merge="Year",all=TRUE)
 
-distribution_fall <- distribution_fall[-45, ]
-distribution_spring <- distribution_spring[-45, ]
-
-rm(EGOM_chw,WGOM_chw,GB_chw,SNE_chw,cod_heatwave,AMO_NAO)
 ####### Check Outliars######
 summary(distribution_fall)
 summary(distribution_spring)
@@ -133,11 +95,7 @@ dotchart(distribution_spring[,4])
 dotchart(distribution_spring[,5])
 dotchart(distribution_spring[,6])
 dotchart(distribution_spring[,7])
-dotchart(distribution_spring[,8])
-dotchart(distribution_spring[,9])
-dotchart(distribution_spring[,10])
-dotchart(distribution_spring[,11])
-dotchart(distribution_spring[,12])
+
 #Fall
 par(mar=c(2,2,0,0), mfrow=c(3,4))
 dotchart(distribution_fall[,4])
