@@ -40,3 +40,9 @@ vignettes/*.pdf
 
 # data folder
 data/
+
+# Rproject
+Atlantic_cod.Rproj
+
+#predation_figure
+code/predation_figure.R
