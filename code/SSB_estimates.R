@@ -66,17 +66,49 @@ SSB_EGOM<-get_ssb(NAA_EGOM,WAA_EGOM,SSB_EGOM)
 SSB_GBK<-get_ssb(NAA_GBK,WAA_GBK,SSB_GBK)
 SSB_SNE<-get_ssb(NAA_SNE,WAA_SNEMA,SSB_SNE)
 
-##### GET SSB ESTIMATES FOR ALL STOCK COMBINED #####
+##### GET SSB ESTIMATES FOR ALL STOCKS COMBINED #####
 
 SSB_allstocks<-list(SSB_EGOM,SSB_WGOM,SSB_GBK,SSB_SNE)
 SSB_allstocks<-Reduce(function(x, y) merge(x, y, all=TRUE), SSB_allstocks)
 SSB_allstocks<-aggregate(SSB~YEAR+SEASON,SSB_allstocks,FUN=sum)
 
 
-#### plot estimates
+#### plot estimates ####
 
 df<-data.frame((SSB_allstocks[SSB_allstocks$SEASON =="FALL",]["YEAR"]),(SSB_allstocks[SSB_allstocks$SEASON =="FALL",]["SSB"]))
 plot(df, type="l")
 
 df<-data.frame((SSB_allstocks[SSB_allstocks$SEASON =="SPRING",]["YEAR"]),(SSB_allstocks[SSB_allstocks$SEASON =="SPRING",]["SSB"]))
 plot(df, type="l")
+
+#### Make Final dfs and save #####
+SSB_Fall_all<-SSB_allstocks[SSB_allstocks$SEASON =="FALL",]
+SSB_Spring_all<-SSB_allstocks[SSB_allstocks$SEASON =="SPRING",]
+
+SSB_Fall_EGOM<-SSB_EGOM[SSB_EGOM$SEASON =="FALL",]
+SSB_Spring_EGOM<-SSB_EGOM[SSB_EGOM$SEASON =="SPRING",]
+
+SSB_Fall_WGOM<-SSB_WGOM[SSB_WGOM$SEASON =="FALL",]
+SSB_Spring_WGOM<-SSB_WGOM[SSB_WGOM$SEASON =="SPRING",]
+
+SSB_Fall_GBK<-SSB_GBK[SSB_GBK$SEASON =="FALL",]
+SSB_Spring_GBK<-SSB_GBK[SSB_GBK$SEASON =="SPRING",]
+
+SSB_Fall_SNE<-SSB_SNE[SSB_SNE$SEASON =="FALL",]
+SSB_Spring_SNE<-SSB_SNE[SSB_SNE$SEASON =="SPRING",]
+
+write.csv(SSB_Fall_all,here("data/SSB_estimates/SSB_Fall_all.csv"), row.names = FALSE)
+write.csv(SSB_Spring_all,here("data/SSB_estimates/SSB_Spring_all.csv"), row.names = FALSE)
+
+write.csv(SSB_Fall_EGOM,here("data/SSB_estimates/SSB_Fall_EGOM.csv"), row.names = FALSE)
+write.csv(SSB_Spring_EGOM,here("data/SSB_estimates/SSB_Spring_EGOM.csv"), row.names = FALSE)
+
+write.csv(SSB_Fall_WGOM,here("data/SSB_estimates/SSB_Fall_WGOM.csv"), row.names = FALSE)
+write.csv(SSB_Spring_WGOM,here("data/SSB_estimates/SSB_Spring_WGOM.csv"), row.names = FALSE)
+
+write.csv(SSB_Fall_GBK,here("data/SSB_estimates/SSB_Fall_GBK.csv"), row.names = FALSE)
+write.csv(SSB_Spring_GBK,here("data/SSB_estimates/SSB_Spring_GBK.csv"), row.names = FALSE)
+
+write.csv(SSB_Fall_SNE,here("data/SSB_estimates/SSB_Fall_SNE.csv"), row.names = FALSE)
+write.csv(SSB_Spring_SNE,here("data/SSB_estimates/SSB_Spring_SNE.csv"), row.names = FALSE)
+
