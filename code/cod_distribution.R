@@ -9,6 +9,10 @@ Bottom_temp_fall<-read.csv(here("data/Friedland_fall_mean_bottom_temp_by_stock.c
 Bottom_temp_spring<-read.csv(here("data/Friedland_spring_mean_bottom_temp_by_stock.csv"))
 Friedland_OISST_fall<-read.csv(here("data/Friedland_OISST_fall.csv"))
 Friedland_OISST_spring<-read.csv(here("data/Friedland_OISST_spr.csv"))
+SSB_Fall_all<-read.csv(here("data/SSB_estimates/SSB_Fall_all.csv"))
+names(SSB_Fall_all)[1] <- "Year"
+SSB_Spring_all<-read.csv(here("data/SSB_estimates/SSB_Spring_all.csv"))
+names(SSB_Spring_all)[1] <- "Year"
 ##### Get cod heatwave data ####
 cod_heatwave<-as.data.frame(ecodata::ESP_heatwave_cod)
 #EGOM
@@ -37,16 +41,16 @@ names(cod_heatwave)[1] <- "Year"
 rm(EGOM_chw,GB_chw,WGOM_chw,SNE_chw)
 ####Combine data into separate data frames by season####
 #put all data frames into list
-distribution_fall <- list(Cod_distribution[,c(1,4,5)], annual_GSI, Bottom_temp_fall[,c(1,6)],Friedland_OISST_fall[,c(1,6)],cod_heatwave[,c(1,6)])
+distribution_fall <- list(Cod_distribution[,c(1,4,5)], annual_GSI, Bottom_temp_fall[,c(1,6)],Friedland_OISST_fall[,c(1,6)],cod_heatwave[,c(1,6)],SSB_Fall_all[,c(1,3)])
 #merge all data frames in list
 distribution_fall<-distribution_fall %>% reduce(full_join, by='Year')
 names(distribution_fall)[4] <- "Avg_GSI"
 
-distribution_spring <- list(Cod_distribution[,c(1,2,3)], annual_GSI, Bottom_temp_spring[,c(1,6)],Friedland_OISST_spring[,c(1,6)],cod_heatwave[,c(1,6)])
+distribution_spring <- list(Cod_distribution[,c(1,2,3)], annual_GSI, Bottom_temp_spring[,c(1,6)],Friedland_OISST_spring[,c(1,6)],cod_heatwave[,c(1,6)],SSB_Spring_all[,c(1,3)])
 distribution_spring<-distribution_spring %>% reduce(full_join, by='Year')
 names(distribution_spring)[4] <- "Avg_GSI"
 ### remove data I don't need ####
-rm(annual_GSI,Bottom_temp_fall,Bottom_temp_spring,Friedland_OISST_fall,Friedland_OISST_spring,Cod_distribution,cod_heatwave)
+rm(annual_GSI,Bottom_temp_fall,Bottom_temp_spring,Friedland_OISST_fall,Friedland_OISST_spring,Cod_distribution,cod_heatwave,SSB_Fall_all,SSB_Spring_all)
 
 ###clip to years with most data###
 distribution_fall = distribution_fall[!distribution_fall$Year > 2019,]
@@ -77,9 +81,10 @@ distribution_spring$bt_anomaly<- distribution_spring$Avg_bt  - bt_spring_bp
 distribution_spring$sst_anomaly<- distribution_spring$Avg_oisst  - sst_spring_bp
 
 ###Get final dataframes ####
-distribution_fall<-distribution_fall[,c(1:4,7:9)]
-distribution_spring<-distribution_spring[,c(1:4,7:9)]
-
+distribution_fall<-distribution_fall[,c(1:4,7:10)]
+distribution_fall$COG_depth_fall<-abs(distribution_fall$COG_depth_fall)
+distribution_spring<-distribution_spring[,c(1:4,7:10)]
+distribution_spring$COG_depth_spring<-abs(distribution_spring$COG_depth_spring)
 #########################
 ############ START ANALYSIS ##################
 
@@ -90,23 +95,22 @@ summary(distribution_fall)
 summary(distribution_spring)
 
 #SPRING
-par(mar=c(2,2,0,0), mfrow=c(3,4))
+par(mar=c(2,2,0,0), mfrow=c(2,3))
 dotchart(distribution_spring[,4])
 dotchart(distribution_spring[,5])
 dotchart(distribution_spring[,6])
 dotchart(distribution_spring[,7])
+dotchart(distribution_spring[,8])
 
 #Fall
-par(mar=c(2,2,0,0), mfrow=c(3,4))
+par(mar=c(2,2,0,0), mfrow=c(2,3))
 dotchart(distribution_fall[,4])
 dotchart(distribution_fall[,5])
 dotchart(distribution_fall[,6])
 dotchart(distribution_fall[,7])
 dotchart(distribution_fall[,8])
-dotchart(distribution_fall[,9])
-dotchart(distribution_fall[,10])
-dotchart(distribution_fall[,11])
-dotchart(distribution_fall[,12])
+
+
 #####PLOT Seasonal Depth changes together on same plot#####
 layout(matrix(1:2, ncol=2, byrow=FALSE))
 par(mar=c(4.1,4.5,1.5,1), oma=c(1.0,0,1.0,0.1))
@@ -125,16 +129,14 @@ legend(2010, 42.0, legend=c("Spring", "Fall"),
        col=c("#EA4F12", "#00608A"), lty=1,lwd=3, cex=1.0)
 ######Boxplots######
 view_boxplot_fun<- function (data){
-  layout(matrix(1:10, ncol=5, byrow=TRUE))
+  layout(matrix(1:8, ncol=4, byrow=TRUE))
   boxplot(data[2],varwidth = TRUE, xlab = "Avg Depth", ylab = "Meters", data = data,cex.lab=1.5, cex.axis=1.5)
   boxplot(data[3],varwidth = TRUE, xlab = "Avg Latitude", ylab = "Degrees Lat", data = data,cex.lab=1.5, cex.axis=1.5)
   boxplot(data[4],varwidth = TRUE, xlab = "Avg GSI", ylab = "Degrees Lat", data = data,cex.lab=1.5, cex.axis=1.5)
-  boxplot(data[7],varwidth = TRUE, xlab = "Avg Fulton's K", ylab = "Condition", data = data,cex.lab=1.5, cex.axis=1.5)
-  boxplot(data[8],varwidth = TRUE, xlab = "Bt Anomaly", ylab = "Deg C", data = data,cex.lab=1.5, cex.axis=1.5)
-  boxplot(data[9],varwidth = TRUE, xlab = "SST Anomaly", ylab = "Deg C", data = data,cex.lab=1.5, cex.axis=1.5)
-  boxplot(data[10],varwidth = TRUE, xlab = "Mean Cumulative Heatwave", ylab = "Deg C", data = data,cex.lab=1.5, cex.axis=1.5)
-  boxplot(data[11],varwidth = TRUE, xlab = "AMO", ylab = "Deg C", data = data,cex.lab=1.5, cex.axis=1.5)
-  boxplot(data[12],varwidth = TRUE, xlab = "NAO", ylab = "Deg C", data = data,cex.lab=1.5, cex.axis=1.5)
+  boxplot(data[6],varwidth = TRUE, xlab = "Avg SSB all stocks", ylab = "Kg", data = data,cex.lab=1.5, cex.axis=1.5)
+  boxplot(data[7],varwidth = TRUE, xlab = "Bt Anomaly", ylab = "Deg C", data = data,cex.lab=1.5, cex.axis=1.5)
+  boxplot(data[8],varwidth = TRUE, xlab = "SST Anomaly", ylab = "Deg C", data = data,cex.lab=1.5, cex.axis=1.5)
+  boxplot(data[5],varwidth = TRUE, xlab = "Mean Cumulative Heatwave", ylab = "Deg C", data = data,cex.lab=1.5, cex.axis=1.5)
 }
 view_boxplot_fun(distribution_fall)
 view_boxplot_fun(distribution_spring)
@@ -145,45 +147,43 @@ par(mar=c(2,2,2,0), mfrow=c(2,4))
 hist(distribution_spring$COG_depth_spring)
 hist(distribution_spring$COG_Lat_spring)
 hist(distribution_spring[,4])
+hist(distribution_spring[,5])
+hist(distribution_spring[,6])
 hist(distribution_spring[,7])
 hist(distribution_spring[,8])
-hist(distribution_spring[,9])
-hist(distribution_spring[,10])
-hist(distribution_spring[,11])
+
+
 hist(distribution_spring[,12])
 #Fall
 par(mar=c(2,2,2,0), mfrow=c(2,4))
 hist(distribution_fall$COG_depth_fall)
 hist(distribution_fall$COG_Lat_fall)
 hist(distribution_fall[,4])
+hist(distribution_fall[,5])
+hist(distribution_fall[,6])
 hist(distribution_fall[,7])
 hist(distribution_fall[,8])
-hist(distribution_fall[,9])
-hist(distribution_fall[,10])
-hist(distribution_fall[,11])
-hist(distribution_fall[,12])
+
 #####shapiro test for normality#####
 #if p >0.05, we can assume normality
 #SPRING
 shapiro.test(distribution_spring$COG_depth_spring)#not normal
 shapiro.test(distribution_spring$COG_Lat_spring)#not normal
 shapiro.test(distribution_spring[,4])
+shapiro.test(distribution_spring[,5])#not normal
+shapiro.test(distribution_spring[,6])#not normal
 shapiro.test(distribution_spring[,7])
 shapiro.test(distribution_spring[,8])
-shapiro.test(distribution_spring[,9])
-shapiro.test(distribution_spring[,10])#not normal
-shapiro.test(distribution_spring[,11])
-shapiro.test(distribution_spring[,12])
+
 #Fall
 shapiro.test(distribution_fall$COG_depth_fall)
 shapiro.test(distribution_fall$COG_Lat_fall)
 shapiro.test(distribution_fall[,4])
+shapiro.test(distribution_fall[,5])#not normal
+shapiro.test(distribution_fall[,6])#not normal
 shapiro.test(distribution_fall[,7])
 shapiro.test(distribution_fall[,8])
-shapiro.test(distribution_fall[,9])
-shapiro.test(distribution_fall[,10])#not normal
-shapiro.test(distribution_fall[,11])
-shapiro.test(distribution_fall[,12])
+
 ####### Check Correlation matrix######
 ############Correlation Coefficient Test#############
 myvif <- function(mod) {
@@ -256,8 +256,8 @@ Mypairs <- function(Z) {
   #print(P)
 }
 
-Mypairs(distribution_fall[c(4,7:12)])
-Mypairs(distribution_spring[c(4,7:12)])
+Mypairs(distribution_fall[c(4:8)])
+Mypairs(distribution_spring[c(4:8)])
 
 ####Making transparent colors for plots below: ####
 t_col <- function(color, percent = 50, name = NULL) {
@@ -302,9 +302,10 @@ GAM_CURVE_FUN_spring<- function(gam_name,data_column,x_lab,y_lab,select1){
 }
 ############# EXPLORATORY GAMs #######################
 ##### DEPTH (Fall) vs. potential environmental influences###########
-FL_Depth<-gam(abs(COG_depth_fall) ~ s(Avg_GSI, k=5)+s(Avg_FK, k=5)+s(bt_anomaly, k=5)+s(sst_anomaly, k=5)+s(mean_c_heatwave, k=5)+s(AMO,k=5)+s(NAO,k=5), family=gaussian(),method = "REML",data=distribution_fall)
+FL_Depth<-gam(abs(COG_depth_fall) ~ s(sst_anomaly, k=5), family=gaussian(),method = "REML",data=distribution_fall)
 summary(FL_Depth)
 FL_Depth$aic
+gam.check(FL_Depth)
 
 #full model, duplicates removed:
 FL_Depth<-gam(abs(COG_depth_fall) ~ s(Avg_GSI, k=5)+s(Avg_FK, k=5)+s(bt_anomaly, k=5)+s(sst_anomaly, k=5)+s(mean_c_heatwave, k=5)+s(AMO,k=5)+s(NAO,k=5), family=gaussian(),method = "REML",data=distribution_fall)
@@ -450,3 +451,118 @@ legend("topleft", inset=0.04, # position
        cex = 1.3,lwd = c(4),lty = c(2),text.col = "black",
        box.col = "black",box.lty=1, box.lwd=1,bty = "o",bg="gray95") # border
 
+
+
+#############################################
+################ Exploring to see if GAM loop works to test more combinations of gam varibales quickly#####
+###### American plaice stock assessment data GAM work
+
+
+targets <- c("COG_depth_fall")
+
+predictors <- colnames(distribution_fall)[!(colnames(distribution_fall) %in% c("COG_depth_fall","COG_Lat_fall", "Year"))]
+
+#create all combinations of predictors
+predictor_combinations <- lapply(1:length(predictors), FUN = function(x){
+  #create combination
+  combination <- combn(predictors, m = x) |> as.data.table()
+  #add s() to all for gam
+  combination <- sapply(combination, FUN = function(y) paste0("s(", y, ",k=5)")) |> as.data.table()
+  #collapse
+  combination <- summarize_all(combination, .funs = paste0, collapse = "+")
+  #unlist
+  combination <- unlist(combination)
+  #remove names
+  names(combination) <- NULL
+  #return
+  return(combination)
+  
+})
+
+#create all combinations of predictors
+predictor_combinations1 <- sapply(predictors, FUN = function(y) paste0("s(", y, ",k=5)"))|> as.data.table()
+rownames(predictor_combinations1) <- 1:nrow(predictor_combinations1)
+#merge combinations of predictors as vector
+predictor_combinations <- do.call(c, predictor_combinations)
+predictor_combinations1 <- do.call(c, predictor_combinations1)
+predictor_combinations <- as.data.frame(predictor_combinations)
+predictor_combinations1 <- as.data.frame(predictor_combinations1)
+names(predictor_combinations1)[1]="predictor_combinations"
+predictor_combinations <- rbind(predictor_combinations,predictor_combinations1) 
+
+### remove list elements that contain duplicate/correlated independent variables
+## in this case, can't have both bt and sst in same model because they are highly correlated
+predictor_combinations <-predictor_combinations[!grepl("bt_anomaly", predictor_combinations$predictor_combinations)| !grepl("sst_anomaly",predictor_combinations$predictor_combinations),]
+predictor_combinations <- as.data.frame(predictor_combinations)
+#taking out models with both heatwave & sst_anomaly
+predictor_combinations <-predictor_combinations[!grepl("sst_anomaly", predictor_combinations$predictor_combinations)| !grepl("mean_c_heatwave",predictor_combinations$predictor_combinations),]
+predictor_combinations <- as.data.frame(predictor_combinations)
+#taking out models with both GSI and bt_anomaly
+predictor_combinations <-predictor_combinations[!grepl("bt_anomaly", predictor_combinations$predictor_combinations)| !grepl("Avg_GSI",predictor_combinations$predictor_combinations),]
+#predictor_combinations <- as.data.frame(predictor_combinations)
+
+
+#create folder to save results to
+if(!dir.exists("data/trial_results")){
+  dir.create("data/trial_results")
+}
+if(!dir.exists("data/trial_results/cod_fall_depth")){
+  dir.create("data/trial_results/cod_fall_depth")
+}
+if(!dir.exists("data/trial_results/cod_fall_depth/models")){
+  dir.create("data/trial_results/cod_fall_depth/models")
+}
+
+#create and save hypergrid (all combinations of targets and predictors combinations)
+#if(!file.exists("data/trial_results/cod_fall_depth/hypergrid.csv")){
+  #create hypergrid and save to trial_results/cod_fall_depth
+  hypergrid <- expand.grid(target = targets, predictors = predictor_combinations) |> as.data.table()
+  
+  #add identifier
+  hypergrid[, model := paste0("model", 1:nrow(hypergrid))]
+  
+  #save to dev
+  fwrite(hypergrid, file = "data/trial_results/cod_fall_depth/hypergrid.csv")
+#} else{
+  #if file exists read
+  hypergrid <- fread("data/trial_results/cod_fall_depth/hypergrid.csv")
+#}
+
+
+#loop through hypergrid, create GAM models
+#progressbar
+pb <- txtProgressBar(min = 1, max = nrow(hypergrid), style = 3)
+for(i in 1:nrow(hypergrid)){
+  #update progressbar
+  setTxtProgressBar(pb, i)
+  
+  #select target
+  target <- hypergrid[i,]$target
+  
+  #select predictors
+  predictors <- hypergrid[i,]$predictors
+  
+  #create formula
+  gam.formula <- as.formula(paste0(target, "~", predictors))
+  
+  #run gam
+  gam.model <- gam(gam.formula, family=gaussian(),method = "REML",data=distribution_fall)
+  
+  #save gam model do trial_results/cod_fall_depth/model
+  saveRDS(gam.model, file = paste0("data/trial_results/cod_fall_depth/models/", hypergrid[i,]$model, ".RDS"))
+}
+
+#example where you extract model performances
+for(i in 1:nrow(hypergrid)){
+  #read the right model
+  rel.model <- readRDS(paste0("data/trial_results/cod_fall_depth/models/", hypergrid[i,]$model, ".RDS"))
+  
+  #extract model performance, add to hypergrid
+  hypergrid[i, AIC := round(rel.model$aic,digits=3)]
+  hypergrid[i, s.pv := list(round(summary(rel.model)[["s.pv"]],digits=3))]
+  hypergrid[i, dev.expl := round(summary(rel.model)[["dev.expl"]],digits=3)]
+  hypergrid[i, family := rel.model$family[1]]
+}
+
+#arrange hypergrid on target and r2
+hypergrid <- dplyr::arrange(hypergrid, hypergrid$target, desc(hypergrid$AIC))

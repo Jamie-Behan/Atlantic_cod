@@ -61,6 +61,18 @@ get_ssb<- function(NAA_data, WAA_data,SSB_stock){
   SSB_stock<-aggregate(SSB~YEAR+SEASON,SSB_stock,FUN=sum)
   
 }
+ 
+SSB_WGOM<-NAA_WGOM[,c(1:7)]
+names(SSB_WGOM)<-c("YEAR", "SEASON","Age6NAA","Age7NAA","Age8NAA","Age9NAA","STOCK")
+SSB_WGOM<-merge(SSB_WGOM,WAA_WGOM,by=c("YEAR","SEASON"),all=TRUE)
+SSB_WGOM$SSB<-((SSB_WGOM$Age6NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 6))+
+                  (SSB_WGOM$Age7NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 7))+
+                  (SSB_WGOM$Age8NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 8))+
+                  (SSB_WGOM$Age9NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 9)))
+SSB_WGOM<-SSB_WGOM[,c(1,2,10)]
+SSB_WGOM<-aggregate(SSB~YEAR+SEASON,SSB_WGOM,FUN=sum)
+
+
 SSB_WGOM<-get_ssb(NAA_WGOM,WAA_WGOM,SSB_WGOM)
 SSB_EGOM<-get_ssb(NAA_EGOM,WAA_EGOM,SSB_EGOM)
 SSB_GBK<-get_ssb(NAA_GBK,WAA_GBK,SSB_GBK)
@@ -72,7 +84,10 @@ SSB_allstocks<-list(SSB_EGOM,SSB_WGOM,SSB_GBK,SSB_SNE)
 SSB_allstocks<-Reduce(function(x, y) merge(x, y, all=TRUE), SSB_allstocks)
 SSB_allstocks<-aggregate(SSB~YEAR+SEASON,SSB_allstocks,FUN=sum)
 
-
+##### combine seasons and EGOM+WGOM to compare to most recent stock assesment ssb plots###
+SSB_GOM<-list(SSB_EGOM,SSB_WGOM)
+SSB_GOM<-Reduce(function(x, y) merge(x, y, all=TRUE), SSB_GOM)
+SSB_GOM<-aggregate(SSB~YEAR,SSB_GOM,FUN=sum)
 #### plot estimates ####
 
 df<-data.frame((SSB_allstocks[SSB_allstocks$SEASON =="FALL",]["YEAR"]),(SSB_allstocks[SSB_allstocks$SEASON =="FALL",]["SSB"]))
@@ -80,6 +95,11 @@ plot(df, type="l")
 
 df<-data.frame((SSB_allstocks[SSB_allstocks$SEASON =="SPRING",]["YEAR"]),(SSB_allstocks[SSB_allstocks$SEASON =="SPRING",]["SSB"]))
 plot(df, type="l")
+
+
+#plot GOM estimates
+
+plot(SSB_GOM$YEAR,SSB_GOM$SSB, type="l")
 
 #### Make Final dfs and save #####
 SSB_Fall_all<-SSB_allstocks[SSB_allstocks$SEASON =="FALL",]
