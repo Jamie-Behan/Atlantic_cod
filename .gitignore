@@ -46,3 +46,6 @@ Atlantic_cod.Rproj
 
 #predation_figure
 code/predation_figure.R
+
+# Figures folder
+Figures/
