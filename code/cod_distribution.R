@@ -493,39 +493,11 @@ hypergrid_tw<-hypergrid_tw[ , !names(hypergrid_tw) %in% c("model")]
 grid.newpage(grid.table(hypergrid_tw))
 ############# PLOT SIGNIFICANT GAM CURVES #######################
 ##### DEPTH (Fall) vs. potential environmental influences###########
-FL_Depth<-gam(COG_depth_fall ~ s(Avg_GSI,k=5)+s(mean_c_heatwave,k=5)+s(SSB,k=5), family=tw(),method = "REML",data=distribution_fall,select=T)
-summary(FL_Depth)
-gam.check(FL_Depth)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(FL_Depth,pch=20, cex=1.2,cex.lab=1.5)
 
-FL_Depth<-gam(COG_depth_fall ~ s(mean_c_heatwave, k=5), family=tw(),method = "REML",data=distribution_fall)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(FL_Depth,pch=20, cex=1.2,cex.lab=1.5)
-
-FL_Depth<-gam(COG_depth_fall ~ s(SSB, k=5), family=tw(),method = "REML",data=distribution_fall)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(FL_Depth,pch=20, cex=1.2,cex.lab=1.5)
-
-###Plot GAM
-layout(matrix(1:1, ncol=1, byrow=FALSE))
-GAM_CURVE_FUN(FL_Depth,distribution_fall$mean_c_heatwave,distribution_fall$Year,x_lab="Mean GSI (Deg lat)",y_lab="PE on Mean Depth",select1=2,title="Environmental Effects on Fall Mean Depth",position="topright")
-
-
+#nothing significant
 
 ##### DEPTH (Spring tow) vs. potential environmental influences##########
-SP_Depth<-gam(abs(COG_depth_spring) ~ s(Avg_GSI, k=5)+s(Avg_FK, k=5)+s(bt_anomaly, k=5)+s(sst_anomaly, k=5)+s(mean_c_heatwave, k=5)+s(AMO,k=5)+s(NAO,k=5), family=Gamma(),method = "REML",data=distribution_spring)
-summary(SP_Depth)
-SP_Depth$aic
-##full model with duplicates removed:
-SP_Depth<-gam(abs(COG_depth_spring) ~ s(Avg_GSI, k=5)+s(Avg_FK, k=5)+s(bt_anomaly, k=5)+s(sst_anomaly, k=5)+s(mean_c_heatwave, k=5)+s(AMO,k=5)+s(NAO,k=5), family=Gamma(),method = "REML",data=distribution_spring)
-summary(SP_Depth)
-SP_Depth$aic
-#reduced model:
-SP_Depth<-gam(abs(COG_depth_spring) ~ s(Avg_GSI, k=5)+s(Avg_FK, k=5)+s(bt_anomaly, k=5)+s(sst_anomaly, k=5)+s(mean_c_heatwave, k=5)+s(AMO,k=5)+s(NAO,k=5), family=Gamma(),method = "REML",data=distribution_spring)
+SP_Depth<-gam(abs(COG_depth_spring) ~ s(SSB, k=5), family=tw(),method = "REML",data=distribution_spring)
 summary(SP_Depth)
 SP_Depth$aic
 
@@ -534,41 +506,24 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(SP_Depth,pch=20, cex=1.2,cex.lab=1.5)
 
 layout(matrix(1:1, ncol=1, byrow=FALSE))
-GAM_CURVE_FUN(SP_Depth,distribution_spring$sst_anomaly,distribution_spring$Year,x_lab="Gulf Stream Index (Deg Lat)",y_lab="PE on Mean Depth",select1=1,title="Environmental Effects on Spring Mean Depth",position="topleft")
+GAM_CURVE_FUN_spring(SP_Depth,distribution_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Depth",select1=1)
 
 ##### LATITUDE (Fall) vs. potential environmental influences###########
-FL_Lat<-gam((COG_Lat_fall) ~ s(Avg_GSI, k=5)+s(Avg_FK, k=5)+s(bt_anomaly, k=5)+s(sst_anomaly, k=5)+s(mean_c_heatwave, k=5)+s(AMO,k=5)+s(NAO,k=5), family=gaussian(),method = "REML",data=distribution_fall) # Build GAM with all possible variables
+FL_Lat<-gam((COG_Lat_fall) ~ s(SSB, k=10), family=tw(),method = "REML",data=distribution_fall) # Build GAM with all possible variables
 summary(FL_Lat) # Find significant variables based on p-value
 FL_Lat$aic
-
-#full model, duplicates removed:
-FL_Lat<-gam((COG_Lat_fall) ~ s(Avg_GSI, k=5)+s(Avg_FK, k=5)+s(bt_anomaly, k=5)+s(sst_anomaly, k=5)+s(mean_c_heatwave, k=5)+s(AMO,k=5)+s(NAO,k=5), family=gaussian(),method = "REML",data=distribution_fall) # Build GAM with all possible variables
-summary(FL_Lat) # Find significant variables based on p-value
-FL_Lat$aic
-
-#reduced model:
-FL_Lat<-gam((COG_Lat_fall) ~ s(Avg_GSI, k=5)+s(Avg_FK, k=5)+s(bt_anomaly, k=5)+s(sst_anomaly, k=5)+s(mean_c_heatwave, k=5)+s(AMO,k=5)+s(NAO,k=5), family=gaussian(),method = "REML",data=distribution_fall) # Build GAM with all possible variables
-summary(FL_Lat) # Find significant variables based on p-value
-FL_Lat$aic
-
-
-###Plot GAM
-layout(matrix(1:3, ncol=1, byrow=FALSE))
-GAM_CURVE_FUN(FL_Lat,distribution_fall$AMO6,distribution_fall$Year,x_lab="Atlantic Multidecadal Oscillation (Δ SST °C)",y_lab="PE on Mean Latitude",select1=1,title="Environmental Effects on Fall Mean Latitude",position="topleft")
-GAM_CURVE_FUN(FL_Lat,distribution_fall$Annual_os_bt_anomaly,distribution_fall$Year,x_lab="Annual Mean Bottom Temperature Anomlay",y_lab="PE on Mean Latitude",select1=2,title=NULL,position="topleft")
-GAM_CURVE_FUN(FL_Lat,distribution_fall$SSB,distribution_fall$Year,x_lab="SSB (kg/tow)",y_lab="PE on Mean Latitude",select1=3,title=NULL,position="topleft")
 
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(FL_Lat,pch=20, cex=1.2,cex.lab=1.5)
 
+###Plot GAM
+layout(matrix(1:1, ncol=1, byrow=FALSE))
+GAM_CURVE_FUN_fall(FL_Lat,distribution_fall$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Latitude",select1=1)
+
 
 ##### Latitude (Spring tow) vs. potential environmental influences##########
-SP_numtow<-gam((COG_Lat_spring) ~ s(Avg_GSI, k=5)+s(mean_c_heatwave, k=5)+s(SSB, k=5), family=tw(),method = "REML",data=distribution_spring,select = T) # Build GAM with all possible variables
-summary(SP_numtow) # Find significant variables based on p-value
-SP_numtow$aic
-
-SP_numtow<-gam((COG_Lat_spring) ~ s(Avg_GSI, k=5), family=tw(),method = "REML",data=distribution_spring,select = T) # Build GAM with all possible variables
+SP_numtow<-gam((COG_Lat_spring) ~ s(mean_c_heatwave, k=5), family=gaussian(),method = "REML",data=distribution_spring) # Build GAM with all possible variables
 summary(SP_numtow) # Find significant variables based on p-value
 SP_numtow$aic
 
@@ -577,62 +532,6 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(SP_numtow,pch=20, cex=1.2,cex.lab=1.5)
 
 ###Plot GAM
-layout(matrix(1:3, ncol=1, byrow=FALSE))
-GAM_CURVE_FUN(SP_numtow,distribution_spring$Avg_GSI,distribution_spring$Year,x_lab="Gulf Stream Index (Deg lat)",y_lab="PE on Mean Latitude",select1=1,title="Environmental Effects on Spring Mean Latitude",position="topleft")
-GAM_CURVE_FUN(SP_numtow,distribution_spring$Annual_mf_bt_anomaly,distribution_spring$Year,x_lab="Annual Mean Bottom Temperature Anomlay",y_lab="PE on Mean Latitude",select1=2,title=NULL,position="topleft")
-GAM_CURVE_FUN(SP_numtow,distribution_spring$SSB,distribution_spring$Year,x_lab="SSB (kg/tow)",y_lab="PE on Mean Latitude",select1=3,title=NULL,position="topleft")
+layout(matrix(1:1, ncol=1, byrow=FALSE))
+GAM_CURVE_FUN_spring(SP_numtow,distribution_spring$mean_c_heatwave,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on Mean Latitude",select1=1)
 ##############
-##### Make figures for RMarkdown#####
-par(mar=c(4.5,4.5,1.5,1.5))
-layout(matrix(1:6, ncol=2, byrow=TRUE))
-qq.gam(FL_Depth, rep = 0, level = 0.9, type = "deviance", rl.col = 2, 
-       rep.col = "gray80",pch=20, cex=1.2,cex.lab=1.2,main = "Fall Depth QQ")
-hist(residuals(FL_Depth, type ="deviance"), xlab = "Residuals", main = "Fall Depth Histogram of residuals",cex.lab=1.2)
-qq.gam(FL_Lat, rep = 0, level = 0.9, type = "deviance", rl.col = 2, 
-       rep.col = "gray80",pch=20, cex=1.2,cex.lab=1.2,main = "Fall Latitude QQ")
-hist(residuals(FL_Lat, type ="deviance"), xlab = "Residuals", main = "Fall Latitude Histogram of residuals",cex.lab=1.2)
-qq.gam(SP_numtow, rep = 0, level = 0.9, type ="deviance", rl.col = 2, 
-       rep.col = "gray80",pch=20, cex=1.2,cex.lab=1.2,main = "Spring Latitude QQ")
-hist(residuals(SP_numtow, type ="deviance"), xlab = "Residuals", main = "Spring Latitude Histogram of residuals",cex.lab=1.2)
-
-##### Combine NAO and bottom temp curves for Fall Depth ####
-layout(matrix(1:3, ncol=1, byrow=TRUE))
-par("mar"=c(4, 5, 1, 1))
-plot.gam(FL_Depth, select =1, scale =0,ylab = expression(bold("PE on Mean Depth")), xlab = expression(bold("Mean Anomalies")), cex.lab=1.6,cex.axis=1.3,col = "#075fb8",shade = TRUE,shade.col=t_col("#075fb8",70,"plot_blt"),lwd = 4, lty=2,rug=FALSE,xlim = c(-1.025,1.025),ylim = c(-0.1,0.1))
-rug(distribution_fall$NAO12, ticksize = 0.07, side = 1, lwd = 2.7, col = "blue")
-abline(h=0, lty=2, col="black", lwd=2.0)
-par(new = TRUE) #plot spring
-plot(FL_Depth, select =2, scale =0,ylab = "", xlab = "",col="#0603cD",axes = FALSE,shade = TRUE,
-     shade.col=t_col("#0603cD",45,"plot_blue"),lwd = 4,lty=2,xlim = c(-1.025,1.025),ylim = c(-0.1,0.1),rug=FALSE)
-rug(distribution_spring$month6_bt_anomaly, ticksize = 0.05, side = 1, lwd = 2.9, col = "#0603cD")
-legend("topleft", inset=0.04, # position
-       legend = c("Fall Annual NAO Anomaly (hPa)","Fall 6-Month Bt Anomaly (°C)"), col = c("#075fb8","#0603cD"),
-       cex = 1.3,lwd = c(4),lty = c(2),text.col = "black",
-       box.col = "black",box.lty=1, box.lwd=1,bty = "o",bg="gray95") # border
-#### Second plot
-plot.gam(FL_Lat, select =2, scale =0,ylab = expression(bold("PE on Mean Latitude")), xlab = expression(bold("Annual Mean Bottom Temperature Anomalies (°C)")), cex.lab=1.6,cex.axis=1.6,col = "#075fb8",shade = TRUE,shade.col=t_col("#075fb8",70,"plot_blt"),lwd = 4, lty=2,rug=FALSE,xlim = c(-0.55,1.4),ylim = c(-0.0025,0.009))
-rug(distribution_fall$Annual_os_bt_anomaly, ticksize = 0.07, side = 1, lwd = 2.7, col = "blue")
-abline(h=0, lty=2, col="black", lwd=2.0)
-par(new = TRUE) #plot spring
-plot(SP_numtow, select =2, scale =0,ylab = "", xlab = "",col="#FF0000",axes = FALSE,shade = TRUE,
-     shade.col=t_col("#FFADAD",45,"plot_red"),lwd = 4,lty=2,xlim = c(-0.55,1.4),ylim = c(-0.0025,0.009),rug=FALSE)
-rug(distribution_spring$Annual_mf_bt_anomaly, ticksize = 0.05, side = 1, lwd = 2.9, col = "#FF0000")
-legend("topleft", inset=0.04, # position
-       legend = c("Fall","Spring"), col = c("#075fb8","#FF0000"),
-       cex = 1.3,lwd = c(4),lty = c(2),text.col = "black",
-       box.col = "black",box.lty=1, box.lwd=1,bty = "o",bg="gray95") # border
-#### Third plot
-
-plot.gam(FL_Lat, select =3, scale =0,ylab = expression(bold("PE on Mean Latitude")), xlab = expression(bold("Am Plaice Mean SSB (kg/tow)")), cex.lab=1.6,cex.axis=1.3,col = "#075fb8",shade = TRUE,shade.col=t_col("#075fb8",70,"plot_blt"),lwd = 4, lty=2,rug=FALSE,xlim = c(0.7,6),ylim = c(-0.0025,0.009))
-rug(distribution_fall$SSB, ticksize = 0.07, side = 1, lwd = 2.7, col = "blue")
-abline(h=0, lty=2, col="black", lwd=2.0)
-par(new = TRUE) #plot spring
-plot(SP_numtow, select =3, scale =0,ylab = "", xlab = "",col="#FF0000",axes = FALSE,shade = TRUE,
-     shade.col=t_col("#FFADAD",45,"plot_red"),lwd = 4,lty=2,xlim = c(0.7,6),ylim = c(-0.0025,0.009),rug=FALSE)
-rug(distribution_spring$SSB, ticksize = 0.05, side = 1, lwd = 2.9, col = "#FF0000")
-legend("topleft", inset=0.04, # position
-       legend = c("Fall","Spring"), col = c("#075fb8","#FF0000"),
-       cex = 1.3,lwd = c(4),lty = c(2),text.col = "black",
-       box.col = "black",box.lty=1, box.lwd=1,bty = "o",bg="gray95") # border
-
-
