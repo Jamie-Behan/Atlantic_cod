@@ -1,6 +1,6 @@
 ###### American plaice stock assessment data GAM work
 library(pacman)
-pacman::p_load(here, readxl,lubridate,stats,graphics,Hmisc,data.table,utils,mgcv,dplyr,purrr,ecodata) 
+pacman::p_load(here, readxl,lubridate,stats,graphics,Hmisc,data.table,utils,mgcv,dplyr,purrr,ecodata,kableExtra) 
 here()
 #### load .csv files #####
 annual_GSI<-read.csv(here("data/annual_GSI.csv"))
@@ -125,7 +125,7 @@ SNE_recruitment_spring$sst_anomaly<- SNE_recruitment_spring$SNE_oisst  - sst_spr
 #write.csv(SNE_recruitment_spring,here("data/stock_area_data/SNE_recruitment_spring.csv"), row.names = FALSE)
 
 ##### Start here ######
-source("Gam_data_exploration.R")
+source(here("Code/Gam_data_exploration.R"))
 
 #put dfs in list to apply across functions
 df.list <- list(EGOM_recruitment_fall,EGOM_recruitment_spring,WGOM_recruitment_fall,WGOM_recruitment_spring,GBK_recruitment_fall,GBK_recruitment_spring,SNE_recruitment_fall,SNE_recruitment_spring)
@@ -134,9 +134,10 @@ df.list <- list(EGOM_recruitment_fall,EGOM_recruitment_spring,WGOM_recruitment_f
 lapply(df.list, dotchart_fun_8)
 lapply(df.list, hist_fun8)
 lapply(df.list, view_boxplot_fun8)
-lapply(df.list, shapiro_fun6)
-
+lapply(df.list, shapiro_fun)
+lapply(df.list,Mypairs)
 #lineplot_seasonal(data,xlab2,ylab2,xlab3,ylab3,xlab4,ylab4,xlab5,ylab5,xlab6,ylab6,xlab7,ylab7)
+
 
 
 

@@ -1,8 +1,9 @@
 ####### Check Outliars######
 dotchart_fun_8<-function(data){
   par(mar=c(2,2,2,0), mfrow=c(2,4))
-  apply(data,MARGIN=2,dotchart)
-}
+for(i in colnames(data)){
+  dotchart(data[[i]],main=i)
+}}
 #####Line plot spring/fal together on same plot#####
 lineplot_seasonal<- function (springdata, falldata, springY, fallY,springX,fallX,main,ylab,ylim){
 layout(matrix(1:1, ncol=1, byrow=FALSE))
@@ -20,22 +21,26 @@ legend("topleft",inset=c(0.03,0.03), legend=c("Spring", "Fall"), col=c("#EA4F12"
 ######Boxplots######
 view_boxplot_fun8<- function (data){
   par(mar=c(2,2,2,0), mfrow=c(2,4))
-  apply(data, MARGIN=2,boxplot)
-}
+  for(i in colnames(data)){
+    boxplot(data[[i]],main=i)
+  }}
 
 ##### check distribtuion ####
 hist_fun8<-function(data){
-par(mar=c(2,2,2,0), mfrow=c(2,4))
-apply(data,MARGIN=2,hist)
-}
+  par(mar=c(2,2,2,0), mfrow=c(2,4))
+  for(i in colnames(data)){
+    hist(data[[i]],main=i)
+}}
 
 #####shapiro test for normality#####
 #if p >0.05, we can assume normality
 #SPRING
-shapiro_fun6<-function(data){
-apply(data,MARGIN=2, FUN=shapiro.test)
-}
-#shapiro_fun6(EGOM_recruitment_fall[2:7]) #example
+shapiro_fun<-function(data){
+  for(i in colnames(data)){
+   bb<-((shapiro.test(data[[i]]))[c(2)])
+  print(as.character(paste0(c(i,(if(bb > 0.05){
+            print("Normal Distribution")}else print("Not Normal"))
+                       ))))}}
 
 ####### Check Correlation matrix######
 ############Correlation Coefficient Test#############
@@ -108,8 +113,6 @@ Mypairs <- function(Z) {
                                              col = gray(0.1)))
   #print(P)
 }
-
-#Mypairs(distribution_fall[c(4:8)]) #example
 
 
 ####Making transparent colors for plots below: ####
