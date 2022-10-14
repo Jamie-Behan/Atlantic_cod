@@ -9,6 +9,7 @@ Bottom_temp_fall<-read.csv(here("data/Friedland_fall_mean_bottom_temp_by_stock.c
 Bottom_temp_spring<-read.csv(here("data/Friedland_spring_mean_bottom_temp_by_stock.csv"))
 Friedland_OISST_fall<-read.csv(here("data/Friedland_OISST_fall.csv"))
 Friedland_OISST_spring<-read.csv(here("data/Friedland_OISST_spr.csv"))
+cod_NAA<-read.csv(here("data/cod_NAA.csv"))
 cod_heatwave<-as.data.frame(ecodata::ESP_heatwave_cod)
 
 ##### Get cod heatwave data ####
@@ -30,64 +31,81 @@ c_od_heatwave<-merge(c_od_heatwave,GB_chw,merge="Time",all=TRUE)
 c_od_heatwave<-merge(c_od_heatwave,SNE_chw,merge="Time",all=TRUE)
 names(c_od_heatwave)[1] <- "Year"
 
+##### filter cod NAA #######
+cod_NAA<- filter(cod_NAA, SURVEY == "NEFSC_BTS")
+names(cod_NAA)[2]<-"Year"
+cod_NAA<-cod_NAA[c(2,3,7,17)]
+EGOM_NAA<-filter(cod_NAA, STOCK == "EGOM")
+WGOM_NAA<-filter(cod_NAA, STOCK == "WGOM")
+SNE_NAA<-filter(cod_NAA, STOCK == "SNE")
+GBK_NAA<-filter(cod_NAA, STOCK == "GBK")
 ####Combine data into separate spring and fall data frames####
 ### EGOM FALL ####
-EGOM_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,2)],Friedland_OISST_fall[,c(1,2)],c_od_heatwave[,c(1,2)]) #put all data frames into list
+EGOM_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,2)],Friedland_OISST_fall[,c(1,2)],c_od_heatwave[,c(1,2)],EGOM_NAA[ which(EGOM_NAA$SEASON=='FALL'),c(1,3)]) #put all data frames into list
 EGOM_recruitment_fall<-EGOM_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
-EGOM_recruitment_fall<-EGOM_recruitment_fall[-45, ]
+EGOM_recruitment_fall<-EGOM_recruitment_fall[6:43, ]
 ### EGOM SPRING ####
-EGOM_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,2)],Friedland_OISST_spring[,c(1,2)],c_od_heatwave[,c(1,2)])
+EGOM_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,2)],Friedland_OISST_spring[,c(1,2)],c_od_heatwave[,c(1,2)],EGOM_NAA[ which(EGOM_NAA$SEASON=='SPRING'),c(1,3)])
 EGOM_recruitment_spring<-EGOM_recruitment_spring %>% reduce(full_join, by='Year')
-EGOM_recruitment_spring<-EGOM_recruitment_spring[-c(45:46), ]
+EGOM_recruitment_spring<-EGOM_recruitment_spring[6:43, ]
 ### WGOM FALL ####
-WGOM_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,4)],Friedland_OISST_fall[,c(1,4)],c_od_heatwave[,c(1,3)]) #put all data frames into list
+WGOM_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,4)],Friedland_OISST_fall[,c(1,4)],c_od_heatwave[,c(1,3)],WGOM_NAA[ which(WGOM_NAA$SEASON=='FALL'),c(1,3)]) #put all data frames into list
 WGOM_recruitment_fall<-WGOM_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
-WGOM_recruitment_fall<-WGOM_recruitment_fall[-45, ]
+WGOM_recruitment_fall<-WGOM_recruitment_fall[6:43, ]
 ### WGOM SPRING ####
-WGOM_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,4)],Friedland_OISST_spring[,c(1,4)],c_od_heatwave[,c(1,3)])
+WGOM_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,4)],Friedland_OISST_spring[,c(1,4)],c_od_heatwave[,c(1,3)],WGOM_NAA[ which(WGOM_NAA$SEASON=='SPRING'),c(1,3)])
 WGOM_recruitment_spring<-WGOM_recruitment_spring %>% reduce(full_join, by='Year')
-WGOM_recruitment_spring<-WGOM_recruitment_spring[-c(45:46), ]
+WGOM_recruitment_spring<-WGOM_recruitment_spring[6:43, ]
 ### GBK FALL ####
-GBK_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,3)],Friedland_OISST_fall[,c(1,3)],c_od_heatwave[,c(1,4)]) #put all data frames into list
+GBK_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,3)],Friedland_OISST_fall[,c(1,3)],c_od_heatwave[,c(1,4)],GBK_NAA[ which(GBK_NAA$SEASON=='FALL'),c(1,3)]) #put all data frames into list
 GBK_recruitment_fall<-GBK_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
-GBK_recruitment_fall<-GBK_recruitment_fall[-45, ]
+GBK_recruitment_fall<-GBK_recruitment_fall[6:43, ]
 ### GBK SPRING ####
-GBK_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,3)],Friedland_OISST_spring[,c(1,3)],c_od_heatwave[,c(1,4)])
+GBK_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,3)],Friedland_OISST_spring[,c(1,3)],c_od_heatwave[,c(1,4)],GBK_NAA[ which(GBK_NAA$SEASON=='SPRING'),c(1,3)])
 GBK_recruitment_spring<-GBK_recruitment_spring %>% reduce(full_join, by='Year')
-GBK_recruitment_spring<-GBK_recruitment_spring[-c(45:46), ]
+GBK_recruitment_spring<-GBK_recruitment_spring[6:43, ]
 ### SNE FALL ####
-SNE_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,5)],Friedland_OISST_fall[,c(1,5)],c_od_heatwave[,c(1,5)]) #No Fulton K data Available
+SNE_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,5)],Friedland_OISST_fall[,c(1,5)],c_od_heatwave[,c(1,5)],SNE_NAA[ which(SNE_NAA$SEASON=='FALL'),c(1,3)]) #No Fulton K data Available
 SNE_recruitment_fall<-SNE_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
-SNE_recruitment_fall<-SNE_recruitment_fall[-45, ]
+SNE_recruitment_fall<-SNE_recruitment_fall[6:43, ]
 ### SNE SPRING ####
-SNE_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,5)],Friedland_OISST_spring[,c(1,5)],c_od_heatwave[,c(1,5)])
+SNE_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,5)],Friedland_OISST_spring[,c(1,5)],c_od_heatwave[,c(1,5)],SNE_NAA[ which(SNE_NAA$SEASON=='SPRING'),c(1,3)])
 SNE_recruitment_spring<-SNE_recruitment_spring %>% reduce(full_join, by='Year')
-SNE_recruitment_spring<-SNE_recruitment_spring[-c(45:46), ]
+SNE_recruitment_spring<-SNE_recruitment_spring[6:43, ]
+### renumber rows ####
+row.names(EGOM_recruitment_fall) <- 1:nrow(EGOM_recruitment_fall)
+row.names(EGOM_recruitment_spring) <- 1:nrow(EGOM_recruitment_spring)
+row.names(WGOM_recruitment_fall) <- 1:nrow(WGOM_recruitment_fall)
+row.names(WGOM_recruitment_spring) <- 1:nrow(WGOM_recruitment_spring)
+row.names(GBK_recruitment_fall) <- 1:nrow(GBK_recruitment_fall)
+row.names(GBK_recruitment_spring) <- 1:nrow(GBK_recruitment_spring)
+row.names(SNE_recruitment_fall) <- 1:nrow(SNE_recruitment_fall)
+row.names(SNE_recruitment_spring) <- 1:nrow(SNE_recruitment_spring)
 ### remove data I don't need ####
-rm(annual_GSI,Bottom_temp_fall,Bottom_temp_spring,Friedland_OISST_fall,Friedland_OISST_spring,EGOM_chw,WGOM_chw,GB_chw,SNE_chw,cod_heatwave,c_od_heatwave)
+rm(annual_GSI,Bottom_temp_fall,Bottom_temp_spring,Friedland_OISST_fall,Friedland_OISST_spring,EGOM_chw,WGOM_chw,GB_chw,SNE_chw,cod_heatwave,c_od_heatwave,cod_NAA,EGOM_NAA,WGOM_NAA,SNE_NAA,GBK_NAA)
 
 ###### Anomaly Base Period########
 ### using 1981-2010 as baseline anomaly period as NOAA does####
 #### EGOM ####
-bt_fall_bp_egom<-mean(EGOM_recruitment_fall[5:34,3])
-bt_spring_bp_egom<-mean(EGOM_recruitment_spring[5:34,3])
-sst_fall_bp_egom<-mean(EGOM_recruitment_fall[5:34,4])
-sst_spring_bp_egom<-mean(EGOM_recruitment_spring[5:34,4])
+bt_fall_bp_egom<-mean(EGOM_recruitment_fall[1:30,3])
+bt_spring_bp_egom<-mean(EGOM_recruitment_spring[1:30,3])
+sst_fall_bp_egom<-mean(EGOM_recruitment_fall[1:30,4])
+sst_spring_bp_egom<-mean(EGOM_recruitment_spring[1:30,4])
 #### WGOM ####
-bt_fall_bp_wgom<-mean(WGOM_recruitment_fall[5:34,3])
-bt_spring_bp_wgom<-mean(WGOM_recruitment_spring[5:34,3])
-sst_fall_bp_wgom<-mean(WGOM_recruitment_fall[5:34,4])
-sst_spring_bp_wgom<-mean(WGOM_recruitment_spring[5:34,4])
+bt_fall_bp_wgom<-mean(WGOM_recruitment_fall[1:30,3])
+bt_spring_bp_wgom<-mean(WGOM_recruitment_spring[1:30,3])
+sst_fall_bp_wgom<-mean(WGOM_recruitment_fall[1:30,4])
+sst_spring_bp_wgom<-mean(WGOM_recruitment_spring[1:30,4])
 #### GBK ####
-bt_fall_bp_gb<-mean(GBK_recruitment_fall[5:34,3])
-bt_spring_bp_gb<-mean(GBK_recruitment_spring[5:34,3])
-sst_fall_bp_gb<-mean(GBK_recruitment_fall[5:34,4])
-sst_spring_bp_gb<-mean(GBK_recruitment_spring[5:34,4])
+bt_fall_bp_gb<-mean(GBK_recruitment_fall[1:30,3])
+bt_spring_bp_gb<-mean(GBK_recruitment_spring[1:30,3])
+sst_fall_bp_gb<-mean(GBK_recruitment_fall[1:30,4])
+sst_spring_bp_gb<-mean(GBK_recruitment_spring[1:30,4])
 #### SNE ####
-bt_fall_bp_sne<-mean(SNE_recruitment_fall[5:34,3])
-bt_spring_bp_sne<-mean(SNE_recruitment_spring[5:34,3])
-sst_fall_bp_sne<-mean(SNE_recruitment_fall[5:34,4])
-sst_spring_bp_sne<-mean(SNE_recruitment_spring[5:34,4])
+bt_fall_bp_sne<-mean(SNE_recruitment_fall[1:30,3])
+bt_spring_bp_sne<-mean(SNE_recruitment_spring[1:30,3])
+sst_fall_bp_sne<-mean(SNE_recruitment_fall[1:30,4])
+sst_spring_bp_sne<-mean(SNE_recruitment_spring[1:30,4])
 ##### Calculate temperature anomaly columns#####
 #### EGOM ####
 EGOM_recruitment_fall$bt_anomaly<- EGOM_recruitment_fall$EGOM_bt  - bt_fall_bp_wgom
@@ -124,6 +142,15 @@ SNE_recruitment_spring$sst_anomaly<- SNE_recruitment_spring$SNE_oisst  - sst_spr
 #write.csv(SNE_recruitment_fall,here("data/stock_area_data/SNE_recruitment_fall.csv"), row.names = FALSE)
 #write.csv(SNE_recruitment_spring,here("data/stock_area_data/SNE_recruitment_spring.csv"), row.names = FALSE)
 
+#### keep only anomaly temperature columns####
+EGOM_recruitment_fall<-EGOM_recruitment_fall[c(1:2,5:8)]
+EGOM_recruitment_spring<-EGOM_recruitment_spring[c(1:2,5:8)]
+WGOM_recruitment_fall<-WGOM_recruitment_fall[c(1:2,5:8)]
+WGOM_recruitment_spring<-WGOM_recruitment_spring[c(1:2,5:8)]
+GBK_recruitment_fall<-GBK_recruitment_fall[c(1:2,5:8)]
+GBK_recruitment_spring<-GBK_recruitment_spring[c(1:2,5:8)]
+SNE_recruitment_fall<-SNE_recruitment_fall[c(1:2,5:8)]
+SNE_recruitment_spring<-SNE_recruitment_spring[c(1:2,5:8)]
 ##### Start here ######
 source(here("Code/Gam_data_exploration.R"))
 
@@ -136,7 +163,16 @@ lapply(df.list, hist_fun8)
 lapply(df.list, view_boxplot_fun8)
 lapply(df.list, shapiro_fun)
 lapply(df.list,Mypairs)
-#lineplot_seasonal(data,xlab2,ylab2,xlab3,ylab3,xlab4,ylab4,xlab5,ylab5,xlab6,ylab6,xlab7,ylab7)
+#### view age 1 timeseries ####
+lineplot_seasonal(springdata=EGOM_recruitment_spring,
+                  falldata=EGOM_recruitment_fall,
+                  springY=EGOM_recruitment_spring$Age.1,
+                  fallY=EGOM_recruitment_fall$Age.1,
+                  fallX= EGOM_recruitment_fall$Year,
+                  springX= EGOM_recruitment_spring$Year,
+                  main="NEFSC Trawl Survey Numbers at Age 1: EGOM",
+                  ylab="Abundance (kg/tow)",
+                  ylim=c(0,3.9))
 
 
 
