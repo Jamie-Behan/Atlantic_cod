@@ -152,8 +152,6 @@ hist(distribution_spring[,6])
 hist(distribution_spring[,7])
 hist(distribution_spring[,8])
 
-
-hist(distribution_spring[,12])
 #Fall
 par(mar=c(2,2,2,0), mfrow=c(2,4))
 hist(distribution_fall$COG_depth_fall)
@@ -302,7 +300,7 @@ GAM_CURVE_FUN_spring<- function(gam_name,data_column,x_lab,y_lab,select1){
 }
 #############################################
 ################ Exploring to see if GAM loop works to test more combinations of gam varibales quickly#####
-GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,hypergrid_name){
+GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ){
   
   #create all combinations of predictors
   predictor_combinations <- lapply(1:length(predictors), FUN = function(x){
@@ -509,7 +507,7 @@ layout(matrix(1:1, ncol=1, byrow=FALSE))
 GAM_CURVE_FUN_spring(SP_Depth,distribution_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Depth",select1=1)
 
 ##### LATITUDE (Fall) vs. potential environmental influences###########
-FL_Lat<-gam((COG_Lat_fall) ~ s(SSB, k=10), family=tw(),method = "REML",data=distribution_fall) # Build GAM with all possible variables
+FL_Lat<-gam((COG_Lat_fall) ~ s(SSB, k=10), family=Gamma(),method = "REML",data=distribution_fall) # Build GAM with all possible variables
 summary(FL_Lat) # Find significant variables based on p-value
 FL_Lat$aic
 
@@ -523,7 +521,7 @@ GAM_CURVE_FUN_fall(FL_Lat,distribution_fall$SSB,x_lab="SSB (kg/tow)",y_lab="PE o
 
 
 ##### Latitude (Spring tow) vs. potential environmental influences##########
-SP_numtow<-gam((COG_Lat_spring) ~ s(mean_c_heatwave, k=5), family=gaussian(),method = "REML",data=distribution_spring) # Build GAM with all possible variables
+SP_numtow<-gam((COG_Lat_spring) ~ s(mean_c_heatwave, k=10), family=tw(),method = "REML",data=distribution_spring) # Build GAM with all possible variables
 summary(SP_numtow) # Find significant variables based on p-value
 SP_numtow$aic
 
@@ -533,5 +531,5 @@ gam.check(SP_numtow,pch=20, cex=1.2,cex.lab=1.5)
 
 ###Plot GAM
 layout(matrix(1:1, ncol=1, byrow=FALSE))
-GAM_CURVE_FUN_spring(SP_numtow,distribution_spring$mean_c_heatwave,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on Mean Latitude",select1=1)
+GAM_CURVE_FUN_spring(SP_numtow,distribution_spring$mean_c_heatwave,x_lab="GSI",y_lab="PE on Mean Latitude",select1=1)
 ##############
