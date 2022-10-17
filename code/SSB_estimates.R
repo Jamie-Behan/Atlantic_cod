@@ -117,18 +117,18 @@ SSB_Spring_GBK<-SSB_GBK[SSB_GBK$SEASON =="SPRING",]
 SSB_Fall_SNE<-SSB_SNE[SSB_SNE$SEASON =="FALL",]
 SSB_Spring_SNE<-SSB_SNE[SSB_SNE$SEASON =="SPRING",]
 
-write.csv(SSB_Fall_all,here("data/SSB_estimates/SSB_Fall_all.csv"), row.names = FALSE)
-write.csv(SSB_Spring_all,here("data/SSB_estimates/SSB_Spring_all.csv"), row.names = FALSE)
+#write.csv(SSB_Fall_all,here("data/SSB_estimates/SSB_Fall_all.csv"), row.names = FALSE)
+#write.csv(SSB_Spring_all,here("data/SSB_estimates/SSB_Spring_all.csv"), row.names = FALSE)
 
-write.csv(SSB_Fall_EGOM,here("data/SSB_estimates/SSB_Fall_EGOM.csv"), row.names = FALSE)
-write.csv(SSB_Spring_EGOM,here("data/SSB_estimates/SSB_Spring_EGOM.csv"), row.names = FALSE)
+#write.csv(SSB_Fall_EGOM,here("data/SSB_estimates/SSB_Fall_EGOM.csv"), row.names = FALSE)
+#write.csv(SSB_Spring_EGOM,here("data/SSB_estimates/SSB_Spring_EGOM.csv"), row.names = FALSE)
 
-write.csv(SSB_Fall_WGOM,here("data/SSB_estimates/SSB_Fall_WGOM.csv"), row.names = FALSE)
-write.csv(SSB_Spring_WGOM,here("data/SSB_estimates/SSB_Spring_WGOM.csv"), row.names = FALSE)
+#write.csv(SSB_Fall_WGOM,here("data/SSB_estimates/SSB_Fall_WGOM.csv"), row.names = FALSE)
+#write.csv(SSB_Spring_WGOM,here("data/SSB_estimates/SSB_Spring_WGOM.csv"), row.names = FALSE)
 
-write.csv(SSB_Fall_GBK,here("data/SSB_estimates/SSB_Fall_GBK.csv"), row.names = FALSE)
-write.csv(SSB_Spring_GBK,here("data/SSB_estimates/SSB_Spring_GBK.csv"), row.names = FALSE)
+#write.csv(SSB_Fall_GBK,here("data/SSB_estimates/SSB_Fall_GBK.csv"), row.names = FALSE)
+#write.csv(SSB_Spring_GBK,here("data/SSB_estimates/SSB_Spring_GBK.csv"), row.names = FALSE)
 
-write.csv(SSB_Fall_SNE,here("data/SSB_estimates/SSB_Fall_SNE.csv"), row.names = FALSE)
-write.csv(SSB_Spring_SNE,here("data/SSB_estimates/SSB_Spring_SNE.csv"), row.names = FALSE)
+#write.csv(SSB_Fall_SNE,here("data/SSB_estimates/SSB_Fall_SNE.csv"), row.names = FALSE)
+#write.csv(SSB_Spring_SNE,here("data/SSB_estimates/SSB_Spring_SNE.csv"), row.names = FALSE)
 
