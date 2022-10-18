@@ -11,6 +11,22 @@ Friedland_OISST_fall<-read.csv(here("data/Friedland_OISST_fall.csv"))
 Friedland_OISST_spring<-read.csv(here("data/Friedland_OISST_spr.csv"))
 cod_NAA<-read.csv(here("data/cod_NAA.csv"))
 cod_heatwave<-as.data.frame(ecodata::ESP_heatwave_cod)
+SSB_Fall_EGOM<-read.csv(here("data/SSB_estimates/SSB_Fall_EGOM.csv"))
+names(SSB_Fall_EGOM)[1] <- "Year"
+SSB_Spring_EGOM<-read.csv(here("data/SSB_estimates/SSB_Spring_EGOM.csv"))
+names(SSB_Spring_EGOM)[1] <- "Year"
+SSB_Fall_WGOM<-read.csv(here("data/SSB_estimates/SSB_Fall_WGOM.csv"))
+names(SSB_Fall_WGOM)[1] <- "Year"
+SSB_Spring_WGOM<-read.csv(here("data/SSB_estimates/SSB_Spring_WGOM.csv"))
+names(SSB_Spring_WGOM)[1] <- "Year"
+SSB_Fall_GBK<-read.csv(here("data/SSB_estimates/SSB_Fall_GBK.csv"))
+names(SSB_Fall_GBK)[1] <- "Year"
+SSB_Spring_GBK<-read.csv(here("data/SSB_estimates/SSB_Spring_GBK.csv"))
+names(SSB_Spring_GBK)[1] <- "Year"
+SSB_Fall_SNE<-read.csv(here("data/SSB_estimates/SSB_Fall_SNE.csv"))
+names(SSB_Fall_SNE)[1] <- "Year"
+SSB_Spring_SNE<-read.csv(here("data/SSB_estimates/SSB_Spring_SNE.csv"))
+names(SSB_Spring_SNE)[1] <- "Year"
 
 ##### Get cod heatwave data ####
 EGOM_chw<-cod_heatwave[(cod_heatwave$stock_id == "EGOM") & (cod_heatwave$Var == "cumulative intensity"), ]
@@ -41,35 +57,35 @@ SNE_NAA<-filter(cod_NAA, STOCK == "SNE")
 GBK_NAA<-filter(cod_NAA, STOCK == "GBK")
 ####Combine data into separate spring and fall data frames####
 ### EGOM FALL ####
-EGOM_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,2)],Friedland_OISST_fall[,c(1,2)],c_od_heatwave[,c(1,2)],EGOM_NAA[ which(EGOM_NAA$SEASON=='FALL'),c(1,3)]) #put all data frames into list
+EGOM_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,2)],Friedland_OISST_fall[,c(1,2)],c_od_heatwave[,c(1,2)],EGOM_NAA[ which(EGOM_NAA$SEASON=='FALL'),c(1,3)],SSB_Fall_EGOM) #put all data frames into list
 EGOM_recruitment_fall<-EGOM_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
 EGOM_recruitment_fall<-EGOM_recruitment_fall[6:43, ]
 ### EGOM SPRING ####
-EGOM_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,2)],Friedland_OISST_spring[,c(1,2)],c_od_heatwave[,c(1,2)],EGOM_NAA[ which(EGOM_NAA$SEASON=='SPRING'),c(1,3)])
+EGOM_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,2)],Friedland_OISST_spring[,c(1,2)],c_od_heatwave[,c(1,2)],EGOM_NAA[ which(EGOM_NAA$SEASON=='SPRING'),c(1,3)],SSB_Spring_EGOM)
 EGOM_recruitment_spring<-EGOM_recruitment_spring %>% reduce(full_join, by='Year')
 EGOM_recruitment_spring<-EGOM_recruitment_spring[6:43, ]
 ### WGOM FALL ####
-WGOM_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,4)],Friedland_OISST_fall[,c(1,4)],c_od_heatwave[,c(1,3)],WGOM_NAA[ which(WGOM_NAA$SEASON=='FALL'),c(1,3)]) #put all data frames into list
+WGOM_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,4)],Friedland_OISST_fall[,c(1,4)],c_od_heatwave[,c(1,3)],WGOM_NAA[ which(WGOM_NAA$SEASON=='FALL'),c(1,3)],SSB_Fall_WGOM) #put all data frames into list
 WGOM_recruitment_fall<-WGOM_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
 WGOM_recruitment_fall<-WGOM_recruitment_fall[6:43, ]
 ### WGOM SPRING ####
-WGOM_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,4)],Friedland_OISST_spring[,c(1,4)],c_od_heatwave[,c(1,3)],WGOM_NAA[ which(WGOM_NAA$SEASON=='SPRING'),c(1,3)])
+WGOM_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,4)],Friedland_OISST_spring[,c(1,4)],c_od_heatwave[,c(1,3)],WGOM_NAA[ which(WGOM_NAA$SEASON=='SPRING'),c(1,3)],SSB_Spring_WGOM)
 WGOM_recruitment_spring<-WGOM_recruitment_spring %>% reduce(full_join, by='Year')
 WGOM_recruitment_spring<-WGOM_recruitment_spring[6:43, ]
 ### GBK FALL ####
-GBK_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,3)],Friedland_OISST_fall[,c(1,3)],c_od_heatwave[,c(1,4)],GBK_NAA[ which(GBK_NAA$SEASON=='FALL'),c(1,3)]) #put all data frames into list
+GBK_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,3)],Friedland_OISST_fall[,c(1,3)],c_od_heatwave[,c(1,4)],GBK_NAA[ which(GBK_NAA$SEASON=='FALL'),c(1,3)],SSB_Fall_GBK) #put all data frames into list
 GBK_recruitment_fall<-GBK_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
 GBK_recruitment_fall<-GBK_recruitment_fall[6:43, ]
 ### GBK SPRING ####
-GBK_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,3)],Friedland_OISST_spring[,c(1,3)],c_od_heatwave[,c(1,4)],GBK_NAA[ which(GBK_NAA$SEASON=='SPRING'),c(1,3)])
+GBK_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,3)],Friedland_OISST_spring[,c(1,3)],c_od_heatwave[,c(1,4)],GBK_NAA[ which(GBK_NAA$SEASON=='SPRING'),c(1,3)],SSB_Spring_GBK)
 GBK_recruitment_spring<-GBK_recruitment_spring %>% reduce(full_join, by='Year')
 GBK_recruitment_spring<-GBK_recruitment_spring[6:43, ]
 ### SNE FALL ####
-SNE_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,5)],Friedland_OISST_fall[,c(1,5)],c_od_heatwave[,c(1,5)],SNE_NAA[ which(SNE_NAA$SEASON=='FALL'),c(1,3)]) #No Fulton K data Available
+SNE_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,5)],Friedland_OISST_fall[,c(1,5)],c_od_heatwave[,c(1,5)],SNE_NAA[ which(SNE_NAA$SEASON=='FALL'),c(1,3)],SSB_Fall_SNE) #No Fulton K data Available
 SNE_recruitment_fall<-SNE_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
 SNE_recruitment_fall<-SNE_recruitment_fall[6:43, ]
 ### SNE SPRING ####
-SNE_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,5)],Friedland_OISST_spring[,c(1,5)],c_od_heatwave[,c(1,5)],SNE_NAA[ which(SNE_NAA$SEASON=='SPRING'),c(1,3)])
+SNE_recruitment_spring <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_spring[,c(1,5)],Friedland_OISST_spring[,c(1,5)],c_od_heatwave[,c(1,5)],SNE_NAA[ which(SNE_NAA$SEASON=='SPRING'),c(1,3)],SSB_Spring_SNE)
 SNE_recruitment_spring<-SNE_recruitment_spring %>% reduce(full_join, by='Year')
 SNE_recruitment_spring<-SNE_recruitment_spring[6:43, ]
 ### renumber rows ####
@@ -82,7 +98,7 @@ row.names(GBK_recruitment_spring) <- 1:nrow(GBK_recruitment_spring)
 row.names(SNE_recruitment_fall) <- 1:nrow(SNE_recruitment_fall)
 row.names(SNE_recruitment_spring) <- 1:nrow(SNE_recruitment_spring)
 ### remove data I don't need ####
-rm(annual_GSI,Bottom_temp_fall,Bottom_temp_spring,Friedland_OISST_fall,Friedland_OISST_spring,EGOM_chw,WGOM_chw,GB_chw,SNE_chw,cod_heatwave,c_od_heatwave,cod_NAA,EGOM_NAA,WGOM_NAA,SNE_NAA,GBK_NAA)
+rm(annual_GSI,Bottom_temp_fall,Bottom_temp_spring,Friedland_OISST_fall,Friedland_OISST_spring,EGOM_chw,WGOM_chw,GB_chw,SNE_chw,cod_heatwave,c_od_heatwave,cod_NAA,EGOM_NAA,WGOM_NAA,SNE_NAA,GBK_NAA,SSB_Fall_EGOM,SSB_Fall_GBK,SSB_Fall_SNE,SSB_Fall_WGOM,SSB_Spring_EGOM,SSB_Spring_GBK,SSB_Spring_SNE,SSB_Spring_WGOM)
 
 ###### Anomaly Base Period########
 ### using 1981-2010 as baseline anomaly period as NOAA does####
@@ -142,38 +158,59 @@ SNE_recruitment_spring$sst_anomaly<- SNE_recruitment_spring$SNE_oisst  - sst_spr
 #write.csv(SNE_recruitment_fall,here("data/stock_area_data/SNE_recruitment_fall.csv"), row.names = FALSE)
 #write.csv(SNE_recruitment_spring,here("data/stock_area_data/SNE_recruitment_spring.csv"), row.names = FALSE)
 #### keep only anomaly temperature columns####
-EGOM_recruitment_fall<-EGOM_recruitment_fall[c(1:2,5:8)]
-EGOM_recruitment_spring<-EGOM_recruitment_spring[c(1:2,5:8)]
-WGOM_recruitment_fall<-WGOM_recruitment_fall[c(1:2,5:8)]
-WGOM_recruitment_spring<-WGOM_recruitment_spring[c(1:2,5:8)]
-GBK_recruitment_fall<-GBK_recruitment_fall[c(1:2,5:8)]
-GBK_recruitment_spring<-GBK_recruitment_spring[c(1:2,5:8)]
-SNE_recruitment_fall<-SNE_recruitment_fall[c(1:2,5:8)]
-SNE_recruitment_spring<-SNE_recruitment_spring[c(1:2,5:8)]
+EGOM_recruitment_fall<-EGOM_recruitment_fall[c(1:2,5:10)]
+EGOM_recruitment_spring<-EGOM_recruitment_spring[c(1:2,5:10)]
+WGOM_recruitment_fall<-WGOM_recruitment_fall[c(1:2,5:10)]
+WGOM_recruitment_spring<-WGOM_recruitment_spring[c(1:2,5:10)]
+GBK_recruitment_fall<-GBK_recruitment_fall[c(1:2,5:10)]
+GBK_recruitment_spring<-GBK_recruitment_spring[c(1:2,5:10)]
+SNE_recruitment_fall<-SNE_recruitment_fall[c(1:2,5:10)]
+SNE_recruitment_spring<-SNE_recruitment_spring[c(1:2,5:10)]
+##### Create R/ssb column####
+EGOM_recruitment_fall$RSSB<-EGOM_recruitment_fall$Age.1/EGOM_recruitment_fall$SSB
+EGOM_recruitment_spring$RSSB<-EGOM_recruitment_spring$Age.1/EGOM_recruitment_spring$SSB
+WGOM_recruitment_fall$RSSB<-WGOM_recruitment_fall$Age.1/WGOM_recruitment_fall$SSB
+WGOM_recruitment_spring$RSSB<-WGOM_recruitment_spring$Age.1/WGOM_recruitment_spring$SSB
+GBK_recruitment_fall$RSSB<-GBK_recruitment_fall$Age.1/GBK_recruitment_fall$SSB
+GBK_recruitment_spring$RSSB<-GBK_recruitment_spring$Age.1/GBK_recruitment_spring$SSB
+SNE_recruitment_fall$RSSB<-SNE_recruitment_fall$Age.1/SNE_recruitment_fall$SSB
+SNE_recruitment_spring$RSSB<-SNE_recruitment_spring$Age.1/SNE_recruitment_spring$SSB
 ####Combine data into separate by region####
-#EGOM_recruitment_fall$SEASON <- paste0(EGOM_recruitment_fall$SEASON, "FALL")
-#EGOM_recruitment_spring$SEASON <- paste0(EGOM_recruitment_spring$SEASON, "SPRING")
+EGOM_recruitment<-rbind(EGOM_recruitment_fall,EGOM_recruitment_spring)
+WGOM_recruitment<-rbind(WGOM_recruitment_fall,WGOM_recruitment_spring)
+GBK_recruitment<-rbind(GBK_recruitment_fall,GBK_recruitment_spring)
+SNE_recruitment<-rbind(SNE_recruitment_fall,SNE_recruitment_spring)
 
-#WGOM_recruitment_fall$SEASON <- paste0(WGOM_recruitment_fall$SEASON, "FALL")
-#WGOM_recruitment_spring$SEASON <- paste0(WGOM_recruitment_spring$SEASON, "SPRING")
+EGOM_recruitment_fall$SEASON<-NULL
+EGOM_recruitment_spring$SEASON<-NULL
+WGOM_recruitment_fall$SEASON<-NULL
+WGOM_recruitment_spring$SEASON<-NULL
+GBK_recruitment_fall$SEASON<-NULL
+GBK_recruitment_spring$SEASON<-NULL
+SNE_recruitment_fall$SEASON<-NULL
+SNE_recruitment_spring$SEASON<-NULL
+#### create logAGE1 column#######
+EGOM_recruitment$logAGE1<-(EGOM_recruitment$Age.1)
+WGOM_recruitment$logAGE1<-(WGOM_recruitment$Age.1)
+GBK_recruitment$logAGE1<-(GBK_recruitment$Age.1)
+SNE_recruitment$logAGE1<-(SNE_recruitment$Age.1)
+#replace NA with small positive value
+EGOM_recruitment["logAGE1"][EGOM_recruitment["logAGE1"] == 0] <- 0.00001
+WGOM_recruitment["logAGE1"][WGOM_recruitment["logAGE1"] == 0] <- 0.00001
+GBK_recruitment["logAGE1"][GBK_recruitment["logAGE1"] == 0] <- 0.00001
+SNE_recruitment["logAGE1"][SNE_recruitment["logAGE1"] == 0]  <- 0.00001
 
-#GBK_recruitment_fall$SEASON <- paste0(GBK_recruitment_fall$SEASON, "FALL")
-#GBK_recruitment_spring$SEASON <- paste0(GBK_recruitment_spring$SEASON, "SPRING")
+EGOM_recruitment[is.nan(EGOM_recruitment)]<-NA
+WGOM_recruitment[is.nan(WGOM_recruitment)]<-NA
+GBK_recruitment[is.nan(GBK_recruitment)]<-NA
+SNE_recruitment[is.nan(SNE_recruitment)]<-NA
 
-#SNE_recruitment_fall$SEASON <- paste0(SNE_recruitment_fall$SEASON, "FALL")
-#SNE_recruitment_spring$SEASON <- paste0(SNE_recruitment_spring$SEASON, "SPRING")
-
-#EGOM_recruitment<-rbind(EGOM_recruitment_fall,EGOM_recruitment_spring)
-#WGOM_recruitment<-rbind(WGOM_recruitment_fall,WGOM_recruitment_spring)
-#GBK_recruitment<-rbind(GBK_recruitment_fall,GBK_recruitment_spring)
-#SNE_recruitment<-rbind(SNE_recruitment_fall,SNE_recruitment_spring)
+EGOM_recruitment$logAGE1<-log(EGOM_recruitment$logAGE1)
+WGOM_recruitment$logAGE1<-log(WGOM_recruitment$logAGE1)
+GBK_recruitment$logAGE1<-log(GBK_recruitment$logAGE1)
+SNE_recruitment$logAGE1<-log(SNE_recruitment$logAGE1)
 ##### Start here ######
 source(here("Code/Gam_data_exploration.R"))
-read.csv(here("data/EGOM_recruitment.csv"))
-read.csv(here("data/WGOM_recruitment.csv"))
-read.csv(here("data/GBK_recruitment.csv"))
-read.csv(here("data/SNE_recruitment.csv"))
-
 #put dfs in list to apply across functions
 df.list <- list(EGOM_recruitment_fall,EGOM_recruitment_spring,WGOM_recruitment_fall,WGOM_recruitment_spring,GBK_recruitment_fall,GBK_recruitment_spring,SNE_recruitment_fall,SNE_recruitment_spring)
 
@@ -281,7 +318,7 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
     return(combination)
   })
   #create all combinations of predictors
-  predictor_combinations1 <- sapply(predictors, FUN = function(y) paste0("s(", y, ",",k,")"))|> as.data.table()
+  predictor_combinations1 <- sapply(predictors, FUN = function(y) paste0("s(", y, ",",k,",by=SEASON)"))|> as.data.table()
   rownames(predictor_combinations1) <- 1:nrow(predictor_combinations1) 
   #merge combinations of predictors as vector
   predictor_combinations <- do.call(c, predictor_combinations)
@@ -337,7 +374,7 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
     #select predictors
     predictors <- hypergrid[i,]$predictors
     #create formula
-    gam.formula <- as.formula(paste0(target, "~", predictors, by= SEASON))
+    gam.formula <- as.formula(paste0(target, "~", predictors))
     #run gam
     gam.model <- gam(gam.formula, familyXYZ,method = "REML",Edata)
     #save gam model do trial_results/folder_name/model
@@ -364,23 +401,12 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
 ####### 
 ####Testing log(R) models######
 ###write column names of dependent "target" variables, and independent "predictors" variables will be all column names other than dependent variables, or any other column name you list (I also listed year)
-############Gaussian###################
-targets <- c("COG_depth_fall")
-predictors <- colnames(distribution_fall)[!(colnames(distribution_fall) %in% c("COG_depth_fall","COG_Lat_fall", "Year"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly","mean_c_heatwave","Avg_GSI")
-
-GAM_LOOP_FUN(Edata=distribution_fall,k="k=10",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= correlated_vars[2],correlated_vars4= correlated_vars[3],correlated_vars5= correlated_vars[1],correlated_vars6= correlated_vars[4],folder_name="cod_fall_depth",familyXYZ= "family=gaussian()")
-hypergrid$s.pv<-as.character(hypergrid$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-grid.newpage(grid.table(hypergrid_gaus))
-
 ############Tweedie###################
-targets <- c("COG_depth_fall")
-predictors <- colnames(distribution_fall)[!(colnames(distribution_fall) %in% c("COG_depth_fall","COG_Lat_fall", "Year"))]
+targets <- c("logAGE1","RSSB")
+predictors <- colnames(EGOM_recruitment)[!(colnames(EGOM_recruitment) %in% c("Age.1","RSSB", "Year","SEASON","logAGE1"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","mean_c_heatwave","Avg_GSI")
 
-GAM_LOOP_FUN(Edata=distribution_fall,k="k=10",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= correlated_vars[2],correlated_vars4= correlated_vars[3],correlated_vars5= correlated_vars[1],correlated_vars6= correlated_vars[4],folder_name="cod_fall_depth",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=EGOM_recruitment,k="k=10",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= correlated_vars[1],correlated_vars4= correlated_vars[4],correlated_vars5= correlated_vars[2],correlated_vars6= correlated_vars[3],folder_name="EGOM_recruitment",familyXYZ= "family=tw()")
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
