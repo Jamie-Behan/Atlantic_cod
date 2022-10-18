@@ -13,7 +13,7 @@ WAA_SNEMA<-read.csv(here("data/WAA/SNEMA_mean_weight_at_age.csv"))
 
 ##### Stock specific SSB estimates#######
 #NAA data wrangling
-Cod_NAA<-Cod_NAA[,c(2:3,12:15,17:18)]
+Cod_NAA<-Cod_NAA[,c(2:3,10:15,17:18)]
 Cod_NAA = Cod_NAA[Cod_NAA$SURVEY == "NEFSC_BTS",]
 Cod_NAA = Cod_NAA[!Cod_NAA$YEAR  < 1982,]
 Cod_NAA = Cod_NAA[!Cod_NAA$YEAR  > 2019,]
@@ -30,19 +30,19 @@ WAA_SNEMA<-WAA_SNEMA[,c(6:8,10)]
 
 ###clip to years I want (1982-2019)###
 WAA_EGOM = WAA_EGOM[!WAA_EGOM$YEAR  < 1982,]
-WAA_EGOM = WAA_EGOM[!WAA_EGOM$AGE  < 6,]
+WAA_EGOM = WAA_EGOM[!WAA_EGOM$AGE  < 4,]
 WAA_EGOM = WAA_EGOM[!WAA_EGOM$AGE  > 9,]
 
 WAA_WGOM = WAA_WGOM[!WAA_WGOM$YEAR  < 1982,]
-WAA_WGOM = WAA_WGOM[!WAA_WGOM$AGE  < 6,]
+WAA_WGOM = WAA_WGOM[!WAA_WGOM$AGE  < 4,]
 WAA_WGOM = WAA_WGOM[!WAA_WGOM$AGE  > 9,]
 
 WAA_GBK = WAA_GBK[!WAA_GBK$YEAR  < 1982,]
-WAA_GBK = WAA_GBK[!WAA_GBK$AGE  < 6,]
+WAA_GBK = WAA_GBK[!WAA_GBK$AGE  < 4,]
 WAA_GBK = WAA_GBK[!WAA_GBK$AGE  > 9,]
 
 WAA_SNEMA = WAA_SNEMA[!WAA_SNEMA$YEAR  < 1982,]
-WAA_SNEMA = WAA_SNEMA[!WAA_SNEMA$AGE  < 6,]
+WAA_SNEMA = WAA_SNEMA[!WAA_SNEMA$AGE  < 4,]
 WAA_SNEMA = WAA_EGOM[!WAA_SNEMA$AGE  > 9,]
 
 ## Create SSB dataframe
@@ -50,26 +50,30 @@ WAA_SNEMA = WAA_EGOM[!WAA_SNEMA$AGE  > 9,]
 #function
 get_ssb<- function(NAA_data, WAA_data,SSB_stock){
   
-  SSB_stock<-NAA_data[,c(1:7)]
-  names(SSB_stock)<-c("YEAR", "SEASON","Age6NAA","Age7NAA","Age8NAA","Age9NAA","STOCK")
+  SSB_stock<-NAA_data[,c(1:9)]
+  names(SSB_stock)<-c("YEAR", "SEASON","Age4NAA","Age5NAA","Age6NAA","Age7NAA","Age8NAA","Age9NAA","STOCK")
   SSB_stock<-merge(SSB_stock,WAA_data,by=c("YEAR","SEASON"),all=TRUE)
-  SSB_stock$SSB<-((SSB_stock$Age6NAA*SSB_stock$MEAN*(SSB_stock$AGE == 6))+
+  SSB_stock$SSB<-((SSB_stock$Age4NAA*SSB_stock$MEAN*(SSB_stock$AGE == 4))+
+                    (SSB_stock$Age5NAA*SSB_stock$MEAN*(SSB_stock$AGE == 5))+
+                    (SSB_stock$Age6NAA*SSB_stock$MEAN*(SSB_stock$AGE == 6))+
                    (SSB_stock$Age7NAA*SSB_stock$MEAN*(SSB_stock$AGE == 7))+
                    (SSB_stock$Age8NAA*SSB_stock$MEAN*(SSB_stock$AGE == 8))+
                    (SSB_stock$Age9NAA*SSB_stock$MEAN*(SSB_stock$AGE == 9)))
-  SSB_stock<-SSB_stock[,c(1,2,10)]
+  SSB_stock<-SSB_stock[,c(1,2,12)]
   SSB_stock<-aggregate(SSB~YEAR+SEASON,SSB_stock,FUN=sum)
   
 }
  
-SSB_WGOM<-NAA_WGOM[,c(1:7)]
-names(SSB_WGOM)<-c("YEAR", "SEASON","Age6NAA","Age7NAA","Age8NAA","Age9NAA","STOCK")
+SSB_WGOM<-NAA_WGOM[,c(1:9)]
+names(SSB_WGOM)<-c("YEAR", "SEASON","Age4NAA","Age5NAA","Age6NAA","Age7NAA","Age8NAA","Age9NAA","STOCK")
 SSB_WGOM<-merge(SSB_WGOM,WAA_WGOM,by=c("YEAR","SEASON"),all=TRUE)
-SSB_WGOM$SSB<-((SSB_WGOM$Age6NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 6))+
+SSB_WGOM$SSB<-((SSB_WGOM$Age4NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 4))+
+                 (SSB_WGOM$Age5NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 5))+
+                 (SSB_WGOM$Age6NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 6))+
                   (SSB_WGOM$Age7NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 7))+
                   (SSB_WGOM$Age8NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 8))+
                   (SSB_WGOM$Age9NAA*SSB_WGOM$MEAN*(SSB_WGOM$AGE == 9)))
-SSB_WGOM<-SSB_WGOM[,c(1,2,10)]
+SSB_WGOM<-SSB_WGOM[,c(1,2,12)]
 SSB_WGOM<-aggregate(SSB~YEAR+SEASON,SSB_WGOM,FUN=sum)
 
 
