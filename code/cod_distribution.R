@@ -1,4 +1,4 @@
-###### American plaice stock assessment data GAM work####
+###### Atlantic Cod stock assessment data GAM work####
 library(pacman)
 pacman::p_load(here, readxl,lubridate,stats,graphics,Hmisc,data.table,utils,mgcv,dplyr,purrr,ecodata,gridExtra) 
 here()
@@ -493,9 +493,8 @@ grid.newpage(grid.table(hypergrid_tw))
 ##### DEPTH (Fall) vs. potential environmental influences###########
 
 #nothing significant
-
 ##### DEPTH (Spring tow) vs. potential environmental influences##########
-SP_Depth<-gam(abs(COG_depth_spring) ~ s(SSB, k=5), family=tw(),method = "REML",data=distribution_spring)
+SP_Depth<-gam(abs(COG_depth_spring) ~ s(SSB, k=10), family=tw(),method = "REML",data=distribution_spring)
 summary(SP_Depth)
 SP_Depth$aic
 
@@ -507,7 +506,7 @@ layout(matrix(1:1, ncol=1, byrow=FALSE))
 GAM_CURVE_FUN_spring(SP_Depth,distribution_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Depth",select1=1)
 
 ##### LATITUDE (Fall) vs. potential environmental influences###########
-FL_Lat<-gam((COG_Lat_fall) ~ s(SSB, k=10), family=Gamma(),method = "REML",data=distribution_fall) # Build GAM with all possible variables
+FL_Lat<-gam((COG_Lat_fall) ~ s(SSB, k=10), family=gaussian(),method = "REML",data=distribution_fall) # Build GAM with all possible variables
 summary(FL_Lat) # Find significant variables based on p-value
 FL_Lat$aic
 
@@ -524,12 +523,17 @@ GAM_CURVE_FUN_fall(FL_Lat,distribution_fall$SSB,x_lab="SSB (kg/tow)",y_lab="PE o
 SP_numtow<-gam((COG_Lat_spring) ~ s(mean_c_heatwave, k=10), family=tw(),method = "REML",data=distribution_spring) # Build GAM with all possible variables
 summary(SP_numtow) # Find significant variables based on p-value
 SP_numtow$aic
+SP_numtow_ssb<-gam((COG_Lat_spring) ~ s(SSB, k=10), family=tw(),method = "REML",data=distribution_spring)
+SP_numtow_gsi<-gam((COG_Lat_spring) ~ s(Avg_GSI, k=10), family=tw(),method = "REML",data=distribution_spring)
 
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(SP_numtow,pch=20, cex=1.2,cex.lab=1.5)
 
 ###Plot GAM
+par(mar=c(4.5,4.3,1,1))
 layout(matrix(1:1, ncol=1, byrow=FALSE))
-GAM_CURVE_FUN_spring(SP_numtow,distribution_spring$mean_c_heatwave,x_lab="GSI",y_lab="PE on Mean Latitude",select1=1)
+GAM_CURVE_FUN_spring(SP_numtow,distribution_spring$mean_c_heatwave,x_lab="Mean Cumulative Heatwave",y_lab="PE on Mean Latitude",select1=1)
+#GAM_CURVE_FUN_spring(SP_numtow_ssb,distribution_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Latitude",select1=1)
+#GAM_CURVE_FUN_spring(SP_numtow_gsi,distribution_spring$Avg_GSI,x_lab="GSI (degrees lat)",y_lab="PE on Mean Latitude",select1=1)
 ##############
