@@ -175,40 +175,49 @@ GBK_recruitment_fall$RSSB<-GBK_recruitment_fall$Age.1/GBK_recruitment_fall$SSB
 GBK_recruitment_spring$RSSB<-GBK_recruitment_spring$Age.1/GBK_recruitment_spring$SSB
 SNE_recruitment_fall$RSSB<-SNE_recruitment_fall$Age.1/SNE_recruitment_fall$SSB
 SNE_recruitment_spring$RSSB<-SNE_recruitment_spring$Age.1/SNE_recruitment_spring$SSB
-####Combine data into separate by region####
-EGOM_recruitment<-rbind(EGOM_recruitment_fall,EGOM_recruitment_spring)
-WGOM_recruitment<-rbind(WGOM_recruitment_fall,WGOM_recruitment_spring)
-GBK_recruitment<-rbind(GBK_recruitment_fall,GBK_recruitment_spring)
-SNE_recruitment<-rbind(SNE_recruitment_fall,SNE_recruitment_spring)
-
-EGOM_recruitment_fall$SEASON<-NULL
-EGOM_recruitment_spring$SEASON<-NULL
-WGOM_recruitment_fall$SEASON<-NULL
-WGOM_recruitment_spring$SEASON<-NULL
-GBK_recruitment_fall$SEASON<-NULL
-GBK_recruitment_spring$SEASON<-NULL
-SNE_recruitment_fall$SEASON<-NULL
-SNE_recruitment_spring$SEASON<-NULL
 #### create logAGE1 column#######
-EGOM_recruitment$logAGE1<-(EGOM_recruitment$Age.1)
-WGOM_recruitment$logAGE1<-(WGOM_recruitment$Age.1)
-GBK_recruitment$logAGE1<-(GBK_recruitment$Age.1)
-SNE_recruitment$logAGE1<-(SNE_recruitment$Age.1)
+EGOM_recruitment_fall$logAGE1<-(EGOM_recruitment_fall$Age.1)
+WGOM_recruitment_fall$logAGE1<-(WGOM_recruitment_fall$Age.1)
+GBK_recruitment_fall$logAGE1<-(GBK_recruitment_fall$Age.1)
+SNE_recruitment_fall$logAGE1<-(SNE_recruitment_fall$Age.1)
+
+EGOM_recruitment_spring$logAGE1<-(EGOM_recruitment_spring$Age.1)
+WGOM_recruitment_spring$logAGE1<-(WGOM_recruitment_spring$Age.1)
+GBK_recruitment_spring$logAGE1<-(GBK_recruitment_spring$Age.1)
+SNE_recruitment_spring$logAGE1<-(SNE_recruitment_spring$Age.1)
 #replace NA with small positive value
-EGOM_recruitment["logAGE1"][EGOM_recruitment["logAGE1"] == 0] <- 0.00001
-WGOM_recruitment["logAGE1"][WGOM_recruitment["logAGE1"] == 0] <- 0.00001
-GBK_recruitment["logAGE1"][GBK_recruitment["logAGE1"] == 0] <- 0.00001
-SNE_recruitment["logAGE1"][SNE_recruitment["logAGE1"] == 0]  <- 0.00001
+EGOM_recruitment_fall["logAGE1"][EGOM_recruitment_fall["logAGE1"] == 0] <- 0.00001
+WGOM_recruitment_fall["logAGE1"][WGOM_recruitment_fall["logAGE1"] == 0] <- 0.00001
+GBK_recruitment_fall["logAGE1"][GBK_recruitment_fall["logAGE1"] == 0] <- 0.00001
+SNE_recruitment_fall["logAGE1"][SNE_recruitment_fall["logAGE1"] == 0]  <- 0.00001
 
-EGOM_recruitment[is.nan(EGOM_recruitment)]<-NA
-WGOM_recruitment[is.nan(WGOM_recruitment)]<-NA
-GBK_recruitment[is.nan(GBK_recruitment)]<-NA
-SNE_recruitment[is.nan(SNE_recruitment)]<-NA
+EGOM_recruitment_spring["logAGE1"][EGOM_recruitment_spring["logAGE1"] == 0] <- 0.00001
+WGOM_recruitment_spring["logAGE1"][WGOM_recruitment_spring["logAGE1"] == 0] <- 0.00001
+GBK_recruitment_spring["logAGE1"][GBK_recruitment_spring["logAGE1"] == 0] <- 0.00001
+SNE_recruitment_spring["logAGE1"][SNE_recruitment_spring["logAGE1"] == 0]  <- 0.00001
 
-EGOM_recruitment$logAGE1<-log(EGOM_recruitment$logAGE1)
-WGOM_recruitment$logAGE1<-log(WGOM_recruitment$logAGE1)
-GBK_recruitment$logAGE1<-log(GBK_recruitment$logAGE1)
-SNE_recruitment$logAGE1<-log(SNE_recruitment$logAGE1)
+SNE_recruitment_fall$RSSB[is.nan(SNE_recruitment_fall$RSSB)]<-NA
+SNE_recruitment_spring$RSSB[is.nan(SNE_recruitment_spring$RSSB)]<-NA
+
+EGOM_recruitment_fall$logAGE1<-log(EGOM_recruitment_fall$logAGE1)
+WGOM_recruitment_fall$logAGE1<-log(WGOM_recruitment_fall$logAGE1)
+GBK_recruitment_fall$logAGE1<-log(GBK_recruitment_fall$logAGE1)
+SNE_recruitment_fall$logAGE1<-log(SNE_recruitment_fall$logAGE1)
+
+EGOM_recruitment_spring$logAGE1<-log(EGOM_recruitment_spring$logAGE1)
+WGOM_recruitment_spring$logAGE1<-log(WGOM_recruitment_spring$logAGE1)
+GBK_recruitment_spring$logAGE1<-log(GBK_recruitment_spring$logAGE1)
+SNE_recruitment_spring$logAGE1<-log(SNE_recruitment_spring$logAGE1)
+#### remove season columns #####
+EGOM_recruitment_fall<-within(EGOM_recruitment_fall,rm("SEASON"))
+WGOM_recruitment_fall<-within(WGOM_recruitment_fall,rm("SEASON"))
+GBK_recruitment_fall<-within(GBK_recruitment_fall,rm("SEASON"))
+SNE_recruitment_fall<-within(SNE_recruitment_fall,rm("SEASON"))
+
+EGOM_recruitment_spring<-within(EGOM_recruitment_spring,rm("SEASON"))
+WGOM_recruitment_spring<-within(WGOM_recruitment_spring,rm("SEASON"))
+GBK_recruitment_spring<-within(GBK_recruitment_spring,rm("SEASON"))
+SNE_recruitment_spring<-within(SNE_recruitment_spring,rm("SEASON"))
 ##### Start here ######
 source(here("Code/Gam_data_exploration.R"))
 #put dfs in list to apply across functions
@@ -406,7 +415,7 @@ targets <- c("logAGE1","RSSB")
 predictors <- colnames(EGOM_recruitment)[!(colnames(EGOM_recruitment) %in% c("Age.1","RSSB", "Year","SEASON","logAGE1"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","mean_c_heatwave","Avg_GSI")
 
-GAM_LOOP_FUN(Edata=EGOM_recruitment,k="k=10",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= correlated_vars[1],correlated_vars4= correlated_vars[4],correlated_vars5= correlated_vars[2],correlated_vars6= correlated_vars[3],folder_name="EGOM_recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=EGOM_recruitment,k="k=7",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= correlated_vars[1],correlated_vars4= correlated_vars[4],correlated_vars5= correlated_vars[2],correlated_vars6= correlated_vars[3],folder_name="EGOM_recruitment",familyXYZ= "family=gaussian()")
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
