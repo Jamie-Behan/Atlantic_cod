@@ -1,6 +1,6 @@
 ####### Check Outliars######
-dotchart_fun_8<-function(data){
-  par(mar=c(2,2,2,0), mfrow=c(2,4))
+dotchart_fun_10<-function(data){
+  par(mar=c(2,2,2,0), mfrow=c(2,5))
 for(i in colnames(data)){
   dotchart(data[[i]],main=i)
 }}
@@ -19,15 +19,15 @@ legend("topleft",inset=c(0.03,0.03), legend=c("Spring", "Fall"), col=c("#EA4F12"
 
 #lineplot_seasonal(springdata=EGOM_recruitment_spring,falldata=EGOM_recruitment_fall,springY=EGOM_recruitment_spring$bt_anomaly,fallY=EGOM_recruitment_fall$bt_anomaly,fallX= EGOM_recruitment_fall$Year,springX= EGOM_recruitment_spring$Year,main="main title",ylab="bt anomaly",ylim=c(-2,3))
 ######Boxplots######
-view_boxplot_fun8<- function (data){
-  par(mar=c(2,2,2,0), mfrow=c(2,4))
+view_boxplot_fun10<- function (data){
+  par(mar=c(2,2,2,0), mfrow=c(2,5))
   for(i in colnames(data)){
     boxplot(data[[i]],main=i)
   }}
 
 ##### check distribtuion ####
-hist_fun8<-function(data){
-  par(mar=c(2,2,2,0), mfrow=c(2,4))
+hist_fun10<-function(data){
+  par(mar=c(2,2,2,0), mfrow=c(2,5))
   for(i in colnames(data)){
     hist(data[[i]],main=i)
 }}
