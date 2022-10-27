@@ -6,8 +6,6 @@ for(i in colnames(data)){
 }}
 #####Line plot spring/fal together on same plot#####
 lineplot_seasonal<- function (springdata, falldata, springY, fallY,springX,fallX,main,ylab,ylim){
-layout(matrix(1:1, ncol=1, byrow=FALSE))
-par(mar=c(4.1,4.5,1.5,1), oma=c(1.0,0,1.0,0.1))
 
 plot(fallY ~fallX, data=falldata, main=main, xlab="Year",ylab=ylab, type="l",lwd=3,col="#00608A",ylim= ylim, cex.lab=1.4,cex.axis=1.1)
 abline(lm(fallY~fallX),col="#00608A",lwd=2.5,lty=2)
