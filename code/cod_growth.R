@@ -121,10 +121,11 @@ lapply(df.list, hist_fun10)
 lapply(df.list, view_boxplot_fun10)
 lapply(df.list, shapiro_fun) #all normal except SSB and heatwave
 lapply(df.list,Mypairs)
-
-#### view age 1 timeseries ####
-
-plot1<-lineplot_seasonal(springdata=EGOM_growth_spring,
+Mypairs(SNE_growth_fall[2:9])
+#### view relative K timeseries ####
+layout(matrix(1:4, ncol=2, byrow=TRUE))
+par(mar=c(4.1,4.5,1.5,1), oma=c(1.0,0,1.0,0.1))
+lineplot_seasonal(springdata=EGOM_growth_spring,
                   falldata=EGOM_growth_fall,
                   springY=EGOM_growth_spring$K_rel,
                   fallY=EGOM_growth_fall$K_rel,
@@ -133,7 +134,7 @@ plot1<-lineplot_seasonal(springdata=EGOM_growth_spring,
                   main="NEFSC Trawl Survey Relative Condition: EGOM",
                   ylab="Relative Condition (K)",
                   ylim=c(0.9,1.3))
-plot1<-lineplot_seasonal(springdata=WGOM_growth_spring,
+lineplot_seasonal(springdata=WGOM_growth_spring,
                   falldata=WGOM_growth_fall,
                   springY=WGOM_growth_spring$K_rel,
                   fallY=WGOM_growth_fall$K_rel,
@@ -160,5 +161,308 @@ lineplot_seasonal(springdata=SNE_growth_spring,
                   main="NEFSC Trawl Survey Relative Condition: SNE",
                   ylab="Relative Condition (K)",
                   ylim=c(0.9,1.3))
-plot_grid( ncol = 2, nrow = 2)
 
+
+
+################ GAM LOOP FUNCTION#####
+GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ){
+  
+  #create all combinations of predictors
+  predictor_combinations <- lapply(1:length(predictors), FUN = function(x){
+    #create combination
+    combination <- combn(predictors, m = x) |> as.data.table()
+    #add s() to all for gam
+    combination <- sapply(combination, FUN = function(y) paste0("s(", y, ",",k,")")) |> as.data.table()
+    #collapse
+    combination <- summarize_all(combination, .funs = paste0, collapse = "+")
+    #unlist
+    combination <- unlist(combination)
+    #remove names
+    names(combination) <- NULL
+    #return
+    return(combination)
+  })
+  #create all combinations of predictors
+  predictor_combinations1 <- sapply(predictors, FUN = function(y) paste0("s(", y, ",",k,")"))|> as.data.table()
+  rownames(predictor_combinations1) <- 1:nrow(predictor_combinations1) 
+  #merge combinations of predictors as vector
+  predictor_combinations <- do.call(c, predictor_combinations)
+  predictor_combinations1 <- do.call(c, predictor_combinations1)
+  predictor_combinations <- as.data.frame(predictor_combinations)
+  predictor_combinations1 <- as.data.frame(predictor_combinations1)
+  names(predictor_combinations1)[1]="predictor_combinations"
+  predictor_combinations <- rbind(predictor_combinations,predictor_combinations1)
+  
+  ### remove list elements that contain duplicate/correlated independent variables
+  ## see correlated_vars character list
+  predictor_combinations <-predictor_combinations[!grepl(correlated_vars1, predictor_combinations$predictor_combinations)| !grepl(correlated_vars2 ,predictor_combinations$predictor_combinations),]
+  
+  if(correlated_vars3!="NA"||correlated_vars4!="NA"){
+    #
+    predictor_combinations <- as.data.frame(predictor_combinations)
+    predictor_combinations <-predictor_combinations[!grepl(correlated_vars3, predictor_combinations$predictor_combinations)| !grepl(correlated_vars4,predictor_combinations$predictor_combinations),]
+  }
+  if(correlated_vars5!="NA"||correlated_vars6!="NA"){
+    #
+    predictor_combinations <- as.data.frame(predictor_combinations)
+    predictor_combinations <-predictor_combinations[!grepl(correlated_vars5, predictor_combinations$predictor_combinations)| !grepl(correlated_vars6,predictor_combinations$predictor_combinations),]  
+  }
+  #create folder to save results to
+  if(!dir.exists("data/trial_results")){
+    dir.create("data/trial_results")
+  }
+  if(!dir.exists(paste0("data/trial_results/",folder_name))){
+    dir.create(paste0("data/trial_results/",folder_name))
+  }
+  if(!dir.exists(paste0("data/trial_results/",folder_name,"/models"))){
+    dir.create(paste0("data/trial_results/",folder_name,"/models"))
+  }
+  
+  #create and save hypergrid (all combinations of targets and predictors combinations)
+  #create hypergrid and save to trial_results/folder_name
+  hypergrid <- expand.grid(target = targets, predictors = predictor_combinations) |> as.data.table()
+  #add identifier
+  hypergrid[, model := paste0("model", 1:nrow(hypergrid))]
+  #save to dev
+  fwrite(hypergrid, file = paste0("data/trial_results/",folder_name,"/hypergrid.csv"))
+  #if file exists read
+  hypergrid <- fread(paste0("data/trial_results/",folder_name,"/hypergrid.csv"))
+  
+  #loop through hypergrid, create GAM models
+  #progressbar
+  pb <- txtProgressBar(min = 1, max = nrow(hypergrid), style = 3)
+  for(i in 1:nrow(hypergrid)){
+    #update progressbar
+    setTxtProgressBar(pb, i)
+    #select target
+    target <- hypergrid[i,]$target
+    #select predictors
+    predictors <- hypergrid[i,]$predictors
+    #create formula
+    gam.formula <- as.formula(paste0(target, "~", predictors))
+    #run gam
+    gam.model <- gam(gam.formula, familyXYZ,method = "REML",Edata)
+    #save gam model do trial_results/folder_name/model
+    saveRDS(gam.model, file = paste0("data/trial_results/", folder_name,"/models/", hypergrid[i,]$model, ".RDS"))
+  }
+  
+  #example where you extract model performances
+  for(i in 1:nrow(hypergrid)){
+    #read the right model
+    rel.model <- readRDS(paste0("data/trial_results/",folder_name,"/models/", hypergrid[i,]$model, ".RDS"))
+    
+    #extract model performance, add to hypergrid
+    hypergrid[i, AIC := round(rel.model$aic,digits=3)]
+    hypergrid[i, s.pv := list(round(summary(rel.model)[["s.pv"]],digits=3))]
+    hypergrid[i, dev.expl := round(summary(rel.model)[["dev.expl"]],digits=3)]
+    hypergrid[i, family := rel.model$family[1]]
+  }
+  
+  #arrange hypergrid and see resulting df showing model diognisc comparisons
+  hypergrid<- dplyr::arrange(hypergrid, hypergrid$target, desc(hypergrid$AIC))
+  .GlobalEnv$hypergrid <- hypergrid
+}
+#############################################
+####### 
+####Testing Relative K models######
+############Gussian###################
+####EGOM SPRING#####
+targets <- c("K_rel")
+predictors <- colnames(EGOM_growth_spring)[!(colnames(EGOM_growth_spring) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=EGOM_growth_spring,k="k=3",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/EGOM_spring_growth_NEFSC.png",height= 23*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+######WGOM SPRING#####
+targets <- c("K_rel")
+predictors <- colnames(WGOM_growth_spring)[!(colnames(WGOM_growth_spring) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=WGOM_growth_spring,k="k=6",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/WGOM_spring_growth_NEFSC.png",height= 23*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+######GBK SPRING#####
+targets <- c("K_rel")
+predictors <- colnames(GBK_growth_spring)[!(colnames(GBK_growth_spring) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=GBK_growth_spring,k="k=6",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/GBK_spring_growth_NEFSC.png",height= 23*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+######SNE SPRING#####
+targets <- c("K_rel")
+predictors <- colnames(SNE_growth_spring)[!(colnames(SNE_growth_spring) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=SNE_growth_spring,k="k=3",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/SNE_spring_growth_NEFSC.png",height= 23*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+####EGOM FALL#####
+targets <- c("K_rel")
+predictors <- colnames(EGOM_growth_fall)[!(colnames(EGOM_growth_fall) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI","EGOM_hw")
+
+GAM_LOOP_FUN(Edata=EGOM_growth_fall,k="k=5",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/EGOM_fall_growth_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+
+####WGOM FALL#####
+targets <- c("K_rel")
+predictors <- colnames(WGOM_growth_fall)[!(colnames(WGOM_growth_fall) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=WGOM_growth_fall,k="k=6",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/WGOM_fall_growth_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+####GBK FALL#####
+targets <- c("K_rel")
+predictors <- colnames(GBK_growth_fall)[!(colnames(GBK_growth_fall) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI")
+
+GAM_LOOP_FUN(Edata=GBK_growth_fall,k="k=6",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/GBK_fall_growth_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+####SNE FALL#####
+targets <- c("K_rel")
+predictors <- colnames(SNE_growth_fall)[!(colnames(SNE_growth_fall) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA","SSB"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI")
+
+GAM_LOOP_FUN(Edata=SNE_growth_fall,k="k=3",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/SNE_fall_growth_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+#test<-gam(K_rel ~ s(SSB, k=2), family=gaussian(),method = "REML",data=SNE_growth_fall)
+#summary(test)
+#test$aic
+
+############# PLOT SIGNIFICANT GAM CURVES #######################
+##### K_rel (SPRING) vs. potential environmental influences###########
+##### EGOM ####
+#nothing significant
+##### WGOM ####
+wgomK<-gam(K_rel ~ s(Avg_GSI,k=6)+s(WGOM_hw, k=6)+s(SSB, k=6)+s(bt_anomaly, k=6), family=gaussian(),method = "REML",data=WGOM_growth_spring)
+summary(wgomK)
+wgomK$aic
+
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(wgomK,pch=20, cex=1.2,cex.lab=1.5)
+
+par(mar=c(4.5,4.5,0.6,1))
+layout(matrix(1:4, ncol=2, byrow=TRUE))
+GAM_CURVE_FUN_spring(wgomK,WGOM_growth_spring$Avg_GSI,x_lab="Mean GSI",y_lab="PE on Relative Condition",select1=1)
+GAM_CURVE_FUN_spring(wgomK,WGOM_growth_spring$WGOM_hw,x_lab="Mean Cumulative Heatwave (Deg C)",y_lab="PE on Mean Relative Condition",select1=2)
+GAM_CURVE_FUN_spring(wgomK,WGOM_growth_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Relative Condition",select1=3)
+GAM_CURVE_FUN_spring(wgomK,WGOM_growth_spring$bt_anomaly,x_lab="Bottom Temperature Anomaly (Deg C)",y_lab="PE on Mean Relative Condition",select1=4)
+##### GBK  ####
+gbkK<-gam(K_rel ~ s(Avg_GSI,k=6)+s(GB_hw, k=6), family=gaussian(),method = "REML",data=GBK_growth_spring)
+summary(gbkK)
+gbkK$aic
+
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(gbkK,pch=20, cex=1.2,cex.lab=1.5)
+
+par(mar=c(4.5,4.5,0.6,1))
+layout(matrix(1:4, ncol=2, byrow=TRUE))
+GAM_CURVE_FUN_spring(gbkK,GBK_growth_spring$Avg_GSI,x_lab="Mean GSI",y_lab="PE on Relative Condition",select1=1)
+GAM_CURVE_FUN_spring(gbkK,GBK_growth_spring$GB_hw,x_lab="Mean Cumulative Heatwave (Deg C)",y_lab="PE on Mean Relative Condition",select1=2)
+##### SNE  ####
+#nothing significant
+##### K_rel  (FALL) vs. potential environmental influences##########
+##### EGOM ####
+EgomK<-gam(K_rel ~ s(bt_anomaly, k=10), family=gaussian(),method = "REML",data=EGOM_growth_fall)
+summary(EgomK)
+EgomK$aic
+
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(EgomK,pch=20, cex=1.2,cex.lab=1.5)
+
+par(mar=c(4.5,4.5,0.6,1))
+layout(matrix(1:4, ncol=2, byrow=TRUE))
+GAM_CURVE_FUN_fall(EgomK,EGOM_growth_fall$bt_anomaly,x_lab="Bottom Temperature Anomaly (Deg C)",y_lab="PE on Relative Condition",select1=1)
+
+##### WGOM ####
+Wgomk<-gam(K_rel ~ s(Avg_GSI,k=9)+s(WGOM_hw,k=9)+s(sst_anomaly,k=9), family=gaussian(),method = "REML",data=WGOM_growth_fall)
+summary(Wgomk)
+Wgomk$aic
+
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(Wgomk,pch=20, cex=1.2,cex.lab=1.5)
+
+par(mar=c(4.5,4.5,0.6,1))
+layout(matrix(1:4, ncol=2, byrow=TRUE))
+GAM_CURVE_FUN_fall(Wgomk,WGOM_growth_fall$Avg_GSI,x_lab="Mean GSI",y_lab="PE on Relative Condition",select1=1)
+GAM_CURVE_FUN_fall(Wgomk,WGOM_growth_fall$WGOM_hw,x_lab="Mean Cumulative Heatwave (Deg C)",y_lab="PE on Relative Condition",select1=2)
+GAM_CURVE_FUN_fall(Wgomk,WGOM_growth_fall$sst_anomaly,x_lab="SST Anomaly (Deg C)",y_lab="PE on Relative Condition",select1=3)
+##### GBK  ####
+GBKk<-gam(K_rel ~ s(Avg_GSI,k=10)+s(GB_hw,k=10)+s(sst_anomaly,k=10), family=gaussian(),method = "REML",data=GBK_growth_fall)
+summary(GBKk)
+GBKk$aic
+
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(GBKk,pch=20, cex=1.2,cex.lab=1.5)
+
+par(mar=c(4.5,4.5,0.6,1))
+layout(matrix(1:4, ncol=2, byrow=TRUE))
+GAM_CURVE_FUN_fall(GBKk,GBK_growth_fall$Avg_GSI,x_lab="Mean GSI",y_lab="PE on Relative Condition",select1=1)
+GAM_CURVE_FUN_fall(GBKk,GBK_growth_fall$GB_hw,x_lab="Mean Cumulative Heatwave (Deg C)",y_lab="PE on Relative Condition",select1=2)
+GAM_CURVE_FUN_fall(GBKk,GBK_growth_fall$sst_anomaly,x_lab="SST Anomaly (Deg C)",y_lab="PE on Relative Condition",select1=3)
+##### SNE  ####
+#Nothing Significant
