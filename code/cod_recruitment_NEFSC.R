@@ -122,7 +122,7 @@ lineplot_seasonal(springdata=EGOM_recruitment_spring,
                   fallY=EGOM_recruitment_fall$lAGE1,
                   fallX= EGOM_recruitment_fall$Year,
                   springX= EGOM_recruitment_spring$Year,
-                  main="Log(Age 1): EGOM",
+                  main="Log(Age 1+1): EGOM",
                   ylab="Abundance (numbers/tow)",
                   ylim=c(0,2))
 lineplot_seasonal(springdata=WGOM_recruitment_spring,
@@ -131,7 +131,7 @@ lineplot_seasonal(springdata=WGOM_recruitment_spring,
                   fallY=WGOM_recruitment_fall$lAGE1,
                   fallX= WGOM_recruitment_fall$Year,
                   springX= WGOM_recruitment_spring$Year,
-                  main="Log(Age 1): WGOM",
+                  main="Log(Age 1+1): WGOM",
                   ylab="Abundance (numbers/tow)",
                   ylim=c(0,2))
 lineplot_seasonal(springdata=GBK_recruitment_spring,
@@ -140,7 +140,7 @@ lineplot_seasonal(springdata=GBK_recruitment_spring,
                   fallY=GBK_recruitment_fall$lAGE1,
                   fallX= GBK_recruitment_fall$Year,
                   springX= GBK_recruitment_spring$Year,
-                  main="Log(Age 1): GBK",
+                  main="Log(Age 1+1): GBK",
                   ylab="Abundance (numbers/tow)",
                   ylim=c(0,2))
 lineplot_seasonal(springdata=SNE_recruitment_spring,
@@ -149,7 +149,7 @@ lineplot_seasonal(springdata=SNE_recruitment_spring,
                   fallY=SNE_recruitment_fall$lAGE1,
                   fallX= SNE_recruitment_fall$Year,
                   springX= SNE_recruitment_spring$Year,
-                  main="Log(Age 1): SNE",
+                  main="Log(Age 1+1): SNE",
                   ylab="Abundance (numbers/tow)",
                   ylim=c(0,2))
 ####View RSSB Timeseries#####
@@ -163,7 +163,7 @@ lineplot_seasonal(springdata=EGOM_recruitment_spring,
                   springX= EGOM_recruitment_spring$Year,
                   main="Log(Age 1): EGOM",
                   ylab="Abundance (numbers/tow)",
-                  ylim=c(0,3))
+                  ylim=c(0,5))
 lineplot_seasonal(springdata=WGOM_recruitment_spring,
                   falldata=WGOM_recruitment_fall,
                   springY=WGOM_recruitment_spring$RSSB,
@@ -172,7 +172,7 @@ lineplot_seasonal(springdata=WGOM_recruitment_spring,
                   springX= WGOM_recruitment_spring$Year,
                   main="Log(Age 1): WGOM",
                   ylab="Abundance (numbers/tow)",
-                  ylim=c(0,3))
+                  ylim=c(0,5))
 lineplot_seasonal(springdata=GBK_recruitment_spring,
                   falldata=GBK_recruitment_fall,
                   springY=GBK_recruitment_spring$RSSB,
@@ -181,7 +181,7 @@ lineplot_seasonal(springdata=GBK_recruitment_spring,
                   springX= GBK_recruitment_spring$Year,
                   main="Log(Age 1): GBK",
                   ylab="Abundance (numbers/tow)",
-                  ylim=c(0,3))
+                  ylim=c(0,5))
 lineplot_seasonal(springdata=SNE_recruitment_spring,
                   falldata=SNE_recruitment_fall,
                   springY=SNE_recruitment_spring$RSSB,
@@ -190,7 +190,7 @@ lineplot_seasonal(springdata=SNE_recruitment_spring,
                   springX= SNE_recruitment_spring$Year,
                   main="Log(Age 1): SNE",
                   ylab="Abundance (numbers/tow)",
-                  ylim=c(0,3))
+                  ylim=c(0,5))
 #############################################
 ################ GAM FOR-LOOP#####
 GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ){
@@ -621,6 +621,7 @@ dev.off()
 egomRSSB<-gam(RSSB ~ s(EGOM_hw,k=8)+s(bt_anomaly,k=8), family=tw(),method = "REML",data=EGOM_recruitment_spring)
 summary(egomRSSB)
 egomRSSB$aic
+
 
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
