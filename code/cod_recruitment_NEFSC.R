@@ -628,7 +628,6 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(egomRSSB,pch=20, cex=1.2,cex.lab=1.5)
 
 png("Figures/GAM_curves/recruitment/EGOM_spring_RSSB_NEFSC.png",width = 898, height = 374.5, units = "px")
-
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:2, ncol=2, byrow=TRUE))
 GAM_CURVE_FUN_spring(egomRSSB,EGOM_recruitment_spring$EGOM_hw,x_lab="Mean Cumulative Heatwave (Deg C)",y_lab="PE on RSSB",select1=1)
@@ -644,7 +643,6 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomRSSB,pch=20, cex=1.2,cex.lab=1.5)
 
 png("Figures/GAM_curves/recruitment/WGOM_spring_RSSB_NEFSC.png",width = 449, height = 374.5, units = "px")
-
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN_spring(wgomRSSB,WGOM_recruitment_spring$WGOM_hw,x_lab="Mean Cumulative Heatwave (Deg C)",y_lab="PE on Log Recrutiment",select1=1)
@@ -666,7 +664,6 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomRSSB,pch=20, cex=1.2,cex.lab=1.5)
 
 png("Figures/GAM_curves/recruitment/WGOM_fall_RSSB_NEFSC.png",width = 898, height = 749, units = "px")
-
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:4, ncol=2, byrow=TRUE))
 GAM_CURVE_FUN_fall(wgomRSSB,WGOM_recruitment_spring$Avg_GSI,x_lab="Mean GSI",y_lab="PE on RSSB",select1=1)
@@ -683,7 +680,6 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(gbkRSSB,pch=20, cex=1.2,cex.lab=1.5)
 
 png("Figures/GAM_curves/recruitment/GBK_fall_RSSB_NEFSC.png",width =449, height =374.5, units = "px")
-
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN_fall(gbkRSSB,GBK_recruitment_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on RSSB",select1=1)
