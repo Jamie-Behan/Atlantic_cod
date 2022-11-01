@@ -103,7 +103,7 @@ plot(df, type="l")
 
 #plot GOM estimates
 
-plot(SSB_GOM$YEAR,SSB_GOM$SSB, type="l")
+plot(SSB_GOM$YEAR,SSB_GOM$SSB, type="l",main="NEFSC Trawl Data SSB Estimates ages 4+")
 
 #### Make Final dfs and save #####
 SSB_Fall_all<-SSB_allstocks[SSB_allstocks$SEASON =="FALL",]
