@@ -612,7 +612,7 @@ gam.check(gbkLR,pch=20, cex=1.2,cex.lab=1.5)
 png("Figures/GAM_curves/recruitment/GBK_fall_logR_NEFSC.png",width = 449, height = 374.5, units = "px")
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN_fall(gbkLR,GBK_recruitment_fall$SSB,x_lab="SSB (Kg/Tow)",y_lab="PE on Relative Condition",select1=1)
+GAM_CURVE_FUN_fall(gbkLR,GBK_recruitment_fall$SSB,x_lab="SSB (Kg/Tow)",y_lab="PE on Log Recruitment",select1=1)
 dev.off()
 ##### SNE  ####
 #nothing significant
