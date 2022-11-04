@@ -6,14 +6,12 @@ WGOM_K<-read.csv(here("data/rel_condition/ADIOS_SV_164712_WGOM_NONE_relative_k.c
 GBK_K<-read.csv(here("data/rel_condition/ADIOS_SV_164712_GBK_NONE_relative_k.csv"))
 SNEMA_K<-read.csv(here("data/rel_condition/ADIOS_SV_164712_SNEMA_NONE_relative_k.csv"))
 
-EGOM_WAA<-read.csv(here("data/WAA/EGOM_mean_weight_at_age.csv"))
-names(EGOM_WAA)[7]<-"Year"
-WGOM_WAA<-read.csv(here("data/WAA/WGOM_mean_weight_at_age.csv"))
-names(WGOM_WAA)[7]<-"Year"
-GBK_WAA<-read.csv(here("data/WAA/GBK_mean_weight_at_age.csv"))
-names(GBK_WAA)[7]<-"Year"
-SNE_WAA<-read.csv(here("data/WAA/SNEMA_mean_weight_at_age.csv"))
-names(SNE_WAA)[7]<-"Year"
+EGOM_WAAa_fall<-read.csv(here("data/WAA/anomaly_data/WAA_EGOM_fall.csv"))
+EGOM_WAAa_spring<-read.csv(here("data/WAA/anomaly_data/WAA_EGOM_spring.csv"))
+WGOM_WAAa_fall<-read.csv(here("data/WAA/anomaly_data/WAA_WGOM_fall.csv"))
+WGOM_WAAa_spring<-read.csv(here("data/WAA/anomaly_data/WAA_WGOM_spring.csv"))
+GBK_WAAa_fall<-read.csv(here("data/WAA/anomaly_data/WAA_GBK_fall.csv"))
+GBK_WAAa_spring<-read.csv(here("data/WAA/anomaly_data/WAA_GBK_spring.csv"))
 ### Reorganize Fulton's K data####
 fulK_data<-function(data,data_fl,data_sp){
   data<- data[,c(5,7,11)]
@@ -35,61 +33,7 @@ fulK_data(data=GBK_K,data_fl = "GBK_K_FL", data_sp = "GBK_K_SP")
 fulK_data(data=SNEMA_K,data_fl = "SNEMA_K_FL", data_sp = "SNEMA_K_SP")
 
 rm(EGOM_K,WGOM_K,GBK_K,SNEMA_K)
-### Reorganize mean WAA data ####
-EGOM_WAA<- EGOM_WAA[c(6,7,8,10)]
-WGOM_WAA<- WGOM_WAA[c(6,7,8,10)]
-GBK_WAA<- GBK_WAA[c(6,7,8,10)]
-SNE_WAA<- SNE_WAA[c(6,7,8,10)]
 
-EGOM_WAA= EGOM_WAA[!EGOM_WAA$Year > 2019,]
-EGOM_WAA= EGOM_WAA[!EGOM_WAA$Year < 1982,]
-WGOM_WAA= WGOM_WAA[!WGOM_WAA$Year > 2019,]
-WGOM_WAA= WGOM_WAA[!WGOM_WAA$Year < 1982,]
-GBK_WAA= GBK_WAA[!GBK_WAA$Year > 2019,]
-GBK_WAA= GBK_WAA[!GBK_WAA$Year < 1982,]
-SNE_WAA= SNE_WAA[!SNE_WAA$Year > 2019,]
-SNE_WAA= SNE_WAA[!SNE_WAA$Year < 1982,]
-
-df<-data.frame(Year=c(1982:2019))
-
-WAA_transform<-function(data,season,newdf){
-newdf<-data.frame(Year = c(1982:2019),
-                        Age1 = merge(data[ which(data$AGE==1 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                        Age2 = merge(data[ which(data$AGE==2 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                        Age3 = merge(data[ which(data$AGE==3 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                        Age4 = merge(data[ which(data$AGE==4 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                        Age5 = merge(data[ which(data$AGE==5 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                        Age6 = merge(data[ which(data$AGE==6 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                        Age7 = merge(data[ which(data$AGE==7 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                        Age8 = merge(data[ which(data$AGE==8 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                        Age9plus = merge((aggregate(MEAN~Year,(merge(data[ which(data$AGE>=9 & data$SEASON == "FALL"),],df,by="Year",all=TRUE)),mean)),df,by="Year",all=TRUE)[2])
-colnames(newdf)[2:10]<-c("Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA")
-return(newdf)
-}
-
-WAA_EGOM_FL<-WAA_transform(EGOM_WAA,"FALL",WAA_EGOM_FL)
-WAA_EGOM_SP<-WAA_transform(EGOM_WAA,"SPRING",WAA_EGOM_SP)
-WAA_WGOM_FL<-WAA_transform(WGOM_WAA,"FALL",WAA_WGOM_FL)
-WAA_WGOM_SP<-WAA_transform(WGOM_WAA,"SPRING",WAA_WGOM_SP)
-WAA_GBK_FL<-WAA_transform(GBK_WAA,"FALL",GBK_WGOM_FL)
-WAA_GBK_SP<-WAA_transform(GBK_WAA,"SPRING",GBK_WGOM_SP)
-
-WAA_transform_SNE<-function(data,season,newdf){
-  newdf<-data.frame(Year = c(1982:2019),
-                    Age1 = merge(data[ which(data$AGE==1 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                    Age2 = merge(data[ which(data$AGE==2 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                    Age3 = merge(data[ which(data$AGE==3 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                    Age4 = merge(data[ which(data$AGE==4 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                    Age5 = merge(data[ which(data$AGE==5 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                    Age6 = merge(data[ which(data$AGE==6 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                    Age7 = merge(data[ which(data$AGE==7 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                    Age8 = merge(data[ which(data$AGE==8 & data$SEASON == season),],df,by="Year",all=TRUE)[4],
-                    Age9plus = merge(data[ which(data$AGE>=9 & data$SEASON == season),],df,by="Year",all=TRUE)[4])
-  colnames(newdf)[2:10]<-c("Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA")
-  return(newdf)
-}
-WAA_SNE_FL<-WAA_transform_SNE(SNE_WAA,"FALL",SNE_WGOM_FL)
-WAA_SNE_SP<-WAA_transform_SNE(SNE_WAA,"SPRING",SNE_WGOM_SP)
 ### turn recruitment data into growth appropriate data frames####
 EGOM_growth_fall<-merge(EGOM_recruitment_fall[c(1,2,5,8:10)],EGOM_K_FL,by="Year",all=TRUE)
 EGOM_growth_spring<-merge(EGOM_recruitment_spring[c(1,2,5,8:10)],EGOM_K_SP,by="Year",all=TRUE)
@@ -108,12 +52,19 @@ GBK_growth_fall<-merge(GBK_growth_fall,WAA_GBK_FL,by="Year",all=TRUE)
 GBK_growth_spring<-merge(GBK_growth_spring,WAA_GBK_SP,by="Year",all=TRUE)
 SNE_growth_fall<-merge(SNE_growth_fall,WAA_SNE_FL,by="Year",all=TRUE)
 SNE_growth_spring<-merge(SNE_growth_spring,WAA_SNE_SP,by="Year",all=TRUE)
+#####merge WAAa dfs with environmental dfs#####
+EGOM_growth_fall<-merge(EGOM_growth_fall,EGOM_WAAa_fall,by="Year",all=TRUE)
+EGOM_growth_spring<-merge(EGOM_growth_spring,EGOM_WAAa_spring,by="Year",all=TRUE)
+WGOM_growth_fall<-merge(WGOM_growth_fall,WGOM_WAAa_fall,by="Year",all=TRUE)
+WGOM_growth_spring<-merge(WGOM_growth_spring,WGOM_WAAa_spring,by="Year",all=TRUE)
+GBK_growth_fall<-merge(GBK_growth_fall,GBK_WAAa_fall,by="Year",all=TRUE)
+GBK_growth_spring<-merge(GBK_growth_spring,GBK_WAAa_spring,by="Year",all=TRUE)
 #####remove dfs I don't Need#####
-rm(EGOM_K_FL,EGOM_K_SP,WGOM_K_FL,WGOM_K_SP,GBK_K_FL,GBK_K_SP,SNEMA_K_FL,SNEMA_K_SP,EGOM_recruitment_fall,EGOM_recruitment_spring,WGOM_recruitment_fall,WGOM_recruitment_spring,GBK_recruitment_fall,GBK_recruitment_spring,SNE_recruitment_fall,SNE_recruitment_spring,EGOM_WAA,WGOM_WAA,GBK_WAA,SNE_WAA,WAA_EGOM_FL,WAA_GBK_FL,WAA_GBK_SP,WAA_SNE_FL,WAA_SNE_SP,df,WAA_WGOM_SP,WAA_WGOM_FL,WAA_EGOM_SP)
+rm(EGOM_K_FL,EGOM_K_SP,WGOM_K_FL,WGOM_K_SP,GBK_K_FL,GBK_K_SP,SNEMA_K_FL,SNEMA_K_SP,EGOM_recruitment_fall,EGOM_recruitment_spring,WGOM_recruitment_fall,WGOM_recruitment_spring,GBK_recruitment_fall,GBK_recruitment_spring,SNE_recruitment_fall,SNE_recruitment_spring,EGOM_WAA,WGOM_WAA,GBK_WAA,SNE_WAA,WAA_EGOM_FL,WAA_GBK_FL,WAA_GBK_SP,WAA_SNE_FL,WAA_SNE_SP,df,WAA_WGOM_SP,WAA_WGOM_FL,WAA_EGOM_SP,EGOM_WAAa_fall,EGOM_WAAa_spring,WGOM_WAAa_fall,WGOM_WAAa_spring,GBK_WAAa_fall,GBK_WAAa_spring)
 ##### Start here ######
 source(here("Code/Gam_data_exploration.R"))
 #put dfs in list to apply across functions
-df.list <- list(EGOM_growth_fall[2:11],EGOM_growth_spring[2:11],WGOM_growth_fall[2:11],WGOM_growth_spring[2:11],GBK_growth_fall[2:11],GBK_growth_spring[2:11],SNE_growth_fall[2:11],SNE_growth_spring[2:11])
+df.list <- list(EGOM_growth_fall,EGOM_growth_spring,WGOM_growth_fall[2:11],WGOM_growth_spring[2:11],GBK_growth_fall[2:11],GBK_growth_spring[2:11],SNE_growth_fall,SNE_growth_spring)
 
 #apply functions
 lapply(df.list, dotchart_fun_10)
@@ -161,8 +112,67 @@ lineplot_seasonal(springdata=SNE_growth_spring,
                   main="NEFSC Trawl Survey Relative Condition: SNE",
                   ylab="Relative Condition (K)",
                   ylim=c(0.9,1.3))
+#### view weight at age anomaly timeseries ####
 
+png(here("Figures/Raw_data_trends/WAAanomaly.png"),height= 800, width = 1700,res=125)
+layout(matrix(1:6, ncol=3, byrow=FALSE))
+par(mar=c(4.1,4.5,1.5,1), oma=c(1.0,0,1.0,0.1))
+##EGOM FALL
+plot(age2_anomaly~Year, data=EGOM_growth_fall, main="Weight at Age Anomalies: EGOM Fall",
+     xlab="Year",ylab="Weight at Age Anomaly (Kg)", type="l",lwd=3,col="#407331",ylim= c(-4.6,5.5),xlim=c(1982,2019), cex.lab=1.4,cex.axis=1.1)
+abline(h=0,col="#6B6B6B",lwd=2.0,lty=2)
+legend("topleft",inset=c(0.02,0.02), legend=c("Age 2"), col=c("#407331"), lty=1,lwd=3.5, cex=0.9)
+##EGOM Spring
+plot(age1_anomaly~Year, data=EGOM_growth_spring, main="Weight at Age Anomalies: EGOM Spring",
+     xlab="Year",ylab="Weight at Age Anomaly (Kg)", type="l",lwd=3,col="#3B4620",ylim= c(-4.6,5.5),xlim=c(1982,2019), cex.lab=1.4,cex.axis=1.1)
+abline(h=0,col="#6B6B6B",lwd=2.0,lty=2)
+legend("topleft",inset=c(0.02,0.02), legend=c("Age 1"), col=c("#3B4620"), lty=1,lwd=3.5, cex=0.9)
+##WGOM Fall
+plot(age1_anomaly~Year, data=WGOM_growth_fall, main="Weight at Age Anomalies: WGOM Fall",
+     xlab="Year",ylab="Weight at Age Anomaly (Kg)", type="l",lwd=3,col="#3B4620",ylim= c(-4.6,5.5),xlim=c(1982,2019), cex.lab=1.4,cex.axis=1.1)
+lines(age2_anomaly~Year, data=WGOM_growth_fall, xlab="Year", type="l",col="#407331",lwd=3)
+lines(age3_anomaly~Year, data=WGOM_growth_fall, xlab="Year", type="l",col="#00608A",lwd=3)
+lines(age4_anomaly~Year, data=WGOM_growth_fall, xlab="Year", type="l",col="#13A49D",lwd=3)
+lines(age5_anomaly~Year, data=WGOM_growth_fall, xlab="Year", type="l",col="#ABB400",lwd=3)
+lines(age6_anomaly~Year, data=WGOM_growth_fall, xlab="Year", type="l",col="#EACA00",lwd=3)
+abline(h=0,col="#6B6B6B",lwd=2.0,lty=2)
+legend("topright",inset=c(0.02,0.02), legend=c("Age 1", "Age 2","Age 3", "Age 4","Age 5","Age 6"), col=c("#3B4620", "#407331","#00608A", "#13A49D","#ABB400", "#EACA00"), lty=1,lwd=3.5, cex=0.9)
+##WGOM Spring
+plot(age1_anomaly~Year, data=WGOM_growth_spring, main="Weight at Age Anomalies: WGOM Spring",
+     xlab="Year",ylab="Weight at Age Anomaly (Kg)", type="l",lwd=3,col="#3B4620",ylim= c(-4.6,5.5),xlim=c(1982,2019), cex.lab=1.4,cex.axis=1.1)
+lines(age7_anomaly~Year, data=WGOM_growth_spring, xlab="Year", type="l",col="#F0713F",lwd=3)
+lines(age2_anomaly~Year, data=WGOM_growth_spring, xlab="Year", type="l",col="#407331",lwd=3)
+lines(age3_anomaly~Year, data=WGOM_growth_spring, xlab="Year", type="l",col="#00608A",lwd=3)
+lines(age4_anomaly~Year, data=WGOM_growth_spring, xlab="Year", type="l",col="#13A49D",lwd=3)
+lines(age5_anomaly~Year, data=WGOM_growth_spring, xlab="Year", type="l",col="#ABB400",lwd=3)
+lines(age6_anomaly~Year, data=WGOM_growth_spring, xlab="Year", type="l",col="#EACA00",lwd=3)
 
+abline(h=0,col="#6B6B6B",lwd=2.0,lty=2)
+legend("topright",inset=c(0.02,0.02), legend=c("Age 1", "Age 2","Age 3", "Age 4","Age 5","Age 6","Age7"), col=c("#3B4620", "#407331","#00608A", "#13A49D","#ABB400", "#EACA00","#F0713F"), lty=1,lwd=3.5, cex=0.9)
+
+##GBK Fall
+plot(age1_anomaly~Year, data=GBK_growth_fall, main="Weight at Age Anomalies: GBK Fall",
+     xlab="Year",ylab="Weight at Age Anomaly (Kg)", type="l",lwd=3,col="#3B4620",ylim= c(-4.6,5.5),xlim=c(1982,2019), cex.lab=1.4,cex.axis=1.1)
+lines(age2_anomaly~Year, data=GBK_growth_fall, xlab="Year", type="l",col="#407331",lwd=3)
+lines(age3_anomaly~Year, data=GBK_growth_fall, xlab="Year", type="l",col="#00608A",lwd=3)
+lines(age4_anomaly~Year, data=GBK_growth_fall, xlab="Year", type="l",col="#13A49D",lwd=3)
+lines(age5_anomaly~Year, data=GBK_growth_fall, xlab="Year", type="l",col="#ABB400",lwd=3)
+abline(h=0,col="#6B6B6B",lwd=2.0,lty=2)
+legend("topright",inset=c(0.02,0.02), legend=c("Age 1", "Age 2","Age 3", "Age 4","Age 5"), col=c("#3B4620", "#407331","#00608A", "#13A49D","#ABB400"), lty=1,lwd=3.5, cex=0.9)
+
+##GBK Spring
+plot(age1_anomaly~Year, data=GBK_growth_spring, main="Weight at Age Anomalies: GBK Spring",
+     xlab="Year",ylab="Weight at Age Anomaly (Kg)", type="l",lwd=3,col="#3B4620",ylim= c(-4.6,5.5),xlim=c(1982,2019), cex.lab=1.4,cex.axis=1.1)
+lines(age7_anomaly~Year, data=GBK_growth_spring, xlab="Year", type="l",col="#F0713F",lwd=3)
+lines(age2_anomaly~Year, data=GBK_growth_spring, xlab="Year", type="l",col="#407331",lwd=3)
+lines(age3_anomaly~Year, data=GBK_growth_spring, xlab="Year", type="l",col="#00608A",lwd=3)
+lines(age4_anomaly~Year, data=GBK_growth_spring, xlab="Year", type="l",col="#13A49D",lwd=3)
+lines(age5_anomaly~Year, data=GBK_growth_spring, xlab="Year", type="l",col="#ABB400",lwd=3)
+lines(age6_anomaly~Year, data=GBK_growth_spring, xlab="Year", type="l",col="#EACA00",lwd=3)
+
+abline(h=0,col="#6B6B6B",lwd=2.0,lty=2)
+legend("topright",inset=c(0.02,0.02), legend=c("Age 1", "Age 2","Age 3", "Age 4","Age 5","Age 6","Age 7"), col=c("#3B4620", "#407331","#00608A", "#13A49D","#ABB400","#EACA00","#F0713F"), lty=1,lwd=3.5, cex=0.9)
+dev.off()
 
 ################ GAM LOOP FUNCTION#####
 GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ){
@@ -265,7 +275,7 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
 #############################################
 ####### 
 ####Testing Relative K models######
-############Gussian###################
+############Gaussian###################
 ####EGOM SPRING#####
 targets <- c("K_rel")
 predictors <- colnames(EGOM_growth_spring)[!(colnames(EGOM_growth_spring) %in% c("Year","K_rel","Age1WAA","Age2WAA","Age3WAA","Age4WAA","Age5WAA","Age6WAA","Age7WAA","Age8WAA","Age9plusWAA"))]
@@ -466,3 +476,112 @@ GAM_CURVE_FUN_fall(GBKk,GBK_growth_fall$GB_hw,x_lab="Mean Cumulative Heatwave (D
 GAM_CURVE_FUN_fall(GBKk,GBK_growth_fall$sst_anomaly,x_lab="SST Anomaly (Deg C)",y_lab="PE on Relative Condition",select1=3)
 ##### SNE  ####
 #Nothing Significant
+#############
+####Testing Weight at Age models######
+####EGOM SPRING#####
+hist(EGOM_growth_spring$age1_anomaly)
+
+targets <- c("age1_anomaly")
+predictors <- colnames(EGOM_growth_spring)[!(colnames(EGOM_growth_spring) %in% c("Year","K_rel","age1_anomaly"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=EGOM_growth_spring,k="k=4",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/EGOM_spring_growthWAA.png",height= 23*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+####EGOM FALL#####
+targets <- c("age2_anomaly")
+predictors <- colnames(EGOM_growth_fall)[!(colnames(EGOM_growth_fall) %in% c("Year","K_rel","age2_anomaly"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI","EGOM_hw")
+
+GAM_LOOP_FUN(Edata=EGOM_growth_fall,k="k=3",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/EGOM_fall_growthWAA.png",height= 24*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+
+
+######WGOM SPRING#####
+targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly")
+predictors <- colnames(WGOM_growth_spring)[!(colnames(WGOM_growth_spring) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=WGOM_growth_spring,k="k=7",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/WGOM_spring_growthWAA.png",height= 23*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+####WGOM FALL#####
+targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly")
+predictors <- colnames(WGOM_growth_fall)[!(colnames(WGOM_growth_fall) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=WGOM_growth_fall,k="k=6",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/WGOM_fall_growthWAA.png",height= 24*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+######GBK SPRING#####
+targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly")
+predictors <- colnames(GBK_growth_spring)[!(colnames(GBK_growth_spring) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=GBK_growth_spring,k="k=6",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/GBK_spring_growthWAA.png",height= 23*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+####GBK FALL#####
+targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly")
+predictors <- colnames(GBK_growth_fall)[!(colnames(GBK_growth_fall) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly"))]
+correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI")
+
+GAM_LOOP_FUN(Edata=GBK_growth_fall,k="k=6",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/GBK_fall_growthWAA.png",height= 24*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
+
+############### PLOT SIGNIFICANT WAA GAM CURVES #######################
+##### WGOM ####
+wgomWAA<-gam(age2_anomaly ~ s(SSB, k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
+summary(wgomWAA)
+wgomWAA$aic
+
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(wgomWAA,pch=20, cex=1.2,cex.lab=1.5)
+
+png("Figures/GAM_curves/growth/WGOM_spring_WAA.png",width = 449, height = 374.5, units = "px")
+par(mar=c(4.5,4.5,0.6,1))
+layout(matrix(1:1, ncol=1, byrow=TRUE))
+GAM_CURVE_FUN_spring(wgomWAA,WGOM_growth_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on WAA Anomaly",select1=3)
+dev.off()
