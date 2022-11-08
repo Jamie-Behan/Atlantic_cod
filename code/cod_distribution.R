@@ -250,10 +250,10 @@ SP_Depth<-gam(abs(COG_depth_spring) ~ s(SSB, k=10), family=tw(),method = "REML",
 summary(SP_Depth)
 SP_Depth$aic
 
-png("Figures/residual_plots/distribution/Spring_Depth.png",width = 500, height = 500, units = "px",res=90)
+png("Figures/residual_plots/distribution/Spring_Depth.png",width = 449, height = 374.5, units = "px",res=90)
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(SP_Depth,pch=20, cex=1.2,cex.lab=1.5)
+gam.check(SP_Depth,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
 png("Figures/GAM_curves/distribution/Spring_Depth.png",width = 449, height = 374.5, units = "px",res=90)
@@ -269,7 +269,7 @@ FL_Lat$aic
 png("Figures/residual_plots/distribution/Fall_Lat.png",width = 449, height = 374.5, units = "px",res=90)
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(FL_Lat,pch=20, cex=1.2,cex.lab=1.5)
+gam.check(FL_Lat,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
 ###Plot GAM
@@ -279,14 +279,14 @@ GAM_CURVE_FUN(FL_Lat,distribution_fall$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mea
 dev.off()
 
 ##### Latitude (Spring tow) vs. potential environmental influences##########
-SP_numtow<-gam((COG_Lat_spring) ~ s(mean_c_heatwave, k=10), family=gaussian(),method = "REML",data=distribution_spring) # Build GAM with all possible variables
-summary(SP_numtow) # Find significant variables based on p-value
+SP_numtow<-gam((COG_Lat_spring) ~ s(mean_c_heatwave, k=10), family=gaussian(),method = "REML",data=distribution_spring)
+summary(SP_numtow)
 SP_numtow$aic
 
 png("Figures/residual_plots/distribution/Spring_Lat.png",width = 449, height = 374.5, units = "px",res=90)
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(SP_numtow,pch=20, cex=1.2,cex.lab=1.5)
+gam.check(SP_numtow,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 ###Plot GAM
 png("Figures/GAM_curves/distribution/Spring_Lat.png",width = 449, height = 374.5, units = "px",res=90)
