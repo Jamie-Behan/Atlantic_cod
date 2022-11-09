@@ -133,14 +133,14 @@ t_col <- function(color, percent = 50, name = NULL) {
 }
 ###Plot GAM Response Curves------ FUNCTION ####
 GAM_CURVE_FUN<- function(gam_name,data_column,data_Year,x_lab,y_lab,select1,title,position){
-  par(mar=c(5,4.5,3,1))
-  plot.gam(gam_name,xlab=paste(x_lab),ylab=paste(y_lab), select=select1,cex.lab=1.5,cex.axis=1.4,rug=FALSE,shade = TRUE,col = "black",shade.col=t_col("lightgray",50,"plot_gray"),lwd = 2.5)
-  rug(subset(data_column, data_Year <=1989), ticksize=0.03, side=1, lwd=2.5,col="blue")
-  rug(subset(data_column, data_Year <=1999 & data_Year >=1990), ticksize=0.05, side=1, lwd=2.5,col="green")
-  rug(subset(data_column, data_Year <=2009 & data_Year >=2000), ticksize=0.05, side=1, lwd=2.5,col="orange")
-  rug(subset(data_column, data_Year <=2019 & data_Year >=2010), ticksize=0.03, side=1, lwd=2.5,col="red")
-  legend(paste(position),inset=c(0.05,0.05), legend =c('1977-1989', '1990-1999','2000-2009', '2010-2019'), pch=16, pt.cex=1.5, cex=1.2, bty='n',
-         col = c("blue", "green","orange", "red"),title="Decade")
+  par(mar=c(4.2,4.3,2.5,0.7))
+  plot.gam(gam_name,xlab=paste(x_lab),ylab=paste(y_lab), select=select1,cex.lab=1.5,cex.axis=1.4,rug=FALSE,shade = TRUE,col = "#535353",shade.col=t_col("#535353",70,"plot_gray"),lwd = 3)
+  rug(subset(data_column, data_Year <=1989), ticksize=0.03, side=1, lwd=2.5,col="#00608A")
+  rug(subset(data_column, data_Year <=1999 & data_Year >=1990), ticksize=0.05, side=1, lwd=2.5,col="#407331")
+  rug(subset(data_column, data_Year <=2009 & data_Year >=2000), ticksize=0.05, side=1, lwd=2.5,col="#EACA00")
+  rug(subset(data_column, data_Year <=2019 & data_Year >=2010), ticksize=0.03, side=1, lwd=2.5,col="#EA4F12")
+  legend(paste(position),inset=c(0.015,0.04), legend =c('1982-1989', '1990-1999','2000-2009', '2010-2019'), pch=16, pt.cex=1.5, cex=1.1, bty='n',
+         col = c("#00608A", "#407331","#EACA00", "#EA4F12"),title="Decade")
   abline(h=0, lty=2, col="tomato3", lwd=2.0)
   title(main=paste(title),cex.main=1.8)
 }
