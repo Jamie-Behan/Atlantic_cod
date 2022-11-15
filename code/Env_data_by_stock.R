@@ -37,21 +37,21 @@ zoo_Fall_GBK<-read.csv(here("data/zooplankton/GB_fall_zooplankton.csv"))
 zoo_Spring_SNE<-read.csv(here("data/zooplankton/SNE_spring_zooplankton.csv"))
 zoo_Fall_SNE<-read.csv(here("data/zooplankton/SNE_fall_zooplankton.csv"))
 
-zoo_Spring_EGOM<-zoo_Spring_EGOM[c(1,11,12)]
+zoo_Spring_EGOM<-zoo_Spring_EGOM[c(1,8,9)]
 names(zoo_Spring_EGOM)[1] <- "Year"
-zoo_Fall_EGOM<-zoo_Fall_EGOM[c(1,11,12)]
+zoo_Fall_EGOM<-zoo_Fall_EGOM[c(1,8,9)]
 names(zoo_Fall_EGOM)[1] <- "Year"
-zoo_Spring_WGOM<-zoo_Spring_WGOM[c(1,11,12)]
+zoo_Spring_WGOM<-zoo_Spring_WGOM[c(1,8,9)]
 names(zoo_Spring_WGOM)[1] <- "Year"
-zoo_Fall_WGOM<-zoo_Fall_WGOM[c(1,11,12)]
+zoo_Fall_WGOM<-zoo_Fall_WGOM[c(1,8,9)]
 names(zoo_Fall_WGOM)[1] <- "Year"
-zoo_Spring_GBK<-zoo_Spring_GBK[c(1,11,12)]
+zoo_Spring_GBK<-zoo_Spring_GBK[c(1,8,9)]
 names(zoo_Spring_GBK)[1] <- "Year"
-zoo_Fall_GBK<-zoo_Fall_GBK[c(1,11,12)]
+zoo_Fall_GBK<-zoo_Fall_GBK[c(1,8,9)]
 names(zoo_Fall_GBK)[1] <- "Year"
-zoo_Spring_SNE<-zoo_Spring_SNE[c(1,11,12)]
+zoo_Spring_SNE<-zoo_Spring_SNE[c(1,8,9)]
 names(zoo_Spring_SNE)[1] <- "Year"
-zoo_Fall_SNE<-zoo_Fall_SNE[c(1,11,12)]
+zoo_Fall_SNE<-zoo_Fall_SNE[c(1,8,9)]
 names(zoo_Fall_SNE)[1] <- "Year"
 ##### Get cod heatwave data ####
 EGOM_chw<-cod_heatwave[(cod_heatwave$stock_id == "EGOM") & (cod_heatwave$Var == "cumulative intensity"), ]
