@@ -16,7 +16,7 @@ WAA_SNEMA<-read.csv(here("data/WAA/SNEMA_mean_weight_at_age.csv"))
 Cod_NAA<-Cod_NAA[,c(2:3,10:15,17:18)]
 Cod_NAA = Cod_NAA[Cod_NAA$SURVEY == "NEFSC_BTS",]
 Cod_NAA = Cod_NAA[!Cod_NAA$YEAR  < 1982,]
-Cod_NAA = Cod_NAA[!Cod_NAA$YEAR  > 2019,]
+Cod_NAA = Cod_NAA[!Cod_NAA$YEAR  > 2021,]
 NAA_EGOM = Cod_NAA[Cod_NAA$STOCK == "EGOM",]
 NAA_WGOM = Cod_NAA[Cod_NAA$STOCK == "WGOM",]
 NAA_GBK = Cod_NAA[Cod_NAA$STOCK == "GBK",]
