@@ -706,7 +706,7 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomRSSB,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/recruitment/RSSB/WGOM_fall_RSSB_NEFSC.png",width = 449, height = 374.5, units = "px")
+png("Figures/GAM_curves/recruitment/RSSB/WGOM_fall_RSSB_NEFSC.png",width = 449, height = 374.5, units = "px",res=90)
 layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN(wgomRSSB,WGOM_recruitment_fall$sst_anomaly,x_lab="SST Anomaly (Deg C)",y_lab="PE on RSSB",select1=1,data_Year = WGOM_recruitment_fall$Year,position = "bottomleft",title="WGOM Fall")
 dev.off()
