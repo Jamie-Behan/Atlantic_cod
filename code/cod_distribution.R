@@ -343,3 +343,19 @@ GAM_CURVE_FUN(SP_numtow,distribution_spring$calfin100m3,x_lab="Calanus Density (
 GAM_CURVE_FUN(SP_numtow,distribution_spring$calfin100m3,x_lab="GSI (Δ Deg Lat)",y_lab="PE on Mean Latitude",select1=2,data_Year = distribution_spring$Year,position="bottomleft",title="Spring Latitude")
 dev.off()
 
+
+##### Combined Pseduocalanus plots for spring and fall depth #####
+png("Figures/GAM_curves/distribution/Depth_pseudo.png",width = 449, height = 374.5, units = "px",res=90)
+par(mar=c(4.5,4.5,3,1))
+plot(FL_Depth, select =1, scale =0,ylab = expression("PE on Mean Depth"), xlab = expression("Pseudocalanus Density (/100m3)"), cex.lab=1.6,cex.axis=1.3,col="#00608A",shade = TRUE,shade.col=t_col("#00608A",70,"plot_ylwt"),lwd = 4,lty=1,xlim = c(-1,1),ylim = c(-0.65,0.5),rug=FALSE,main= "Fall & Spring Depth",cex.main=2)
+rug(distribution_fall$pseudo100m3, ticksize = 0.05, side = 1, lwd = 2.5, col = "#00608A")
+abline(h=0, lty=2, col="black", lwd=2.0)
+par(new = TRUE) 
+plot(SP_Depth, select =1, scale =0,ylab = "", xlab = "",col="#535353",axes = FALSE,shade = TRUE,
+     shade.col=t_col("#535353",70,"plot_red"),lwd = 4,lty=1,xlim = c(-1,1),ylim = c(-0.65,0.5),rug=FALSE)
+rug(distribution_spring$pseudo100m3, ticksize = 0.05, side = 1, lwd = 2.5, col = "#535353")
+legend("topleft", inset=0.04, # position
+       legend = c("Fall","Spring"),col = c("#00608A","#535353"),
+       cex = 1,lwd = c(4,4),lty = c(2,2),text.col = "black",
+       box.col = "black",box.lty=1, box.lwd=1,bty = "o",bg="gray95") # border
+dev.off()
