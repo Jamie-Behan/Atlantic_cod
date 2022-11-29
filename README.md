@@ -8,9 +8,9 @@
 
 ###   **1. "Code" folder containing R code used:**
   
-- "**DisMAP_vs_adultjuv_raw.R**" - .R used to explre possible differences between DisMAP data and NEFSC distribution data disaggregated by adults and juveniles to explore potential environmental effects by maturity stage.
+- "**DisMAP_vs_adultjuv_raw.R**" - .R used to explre possible differences between [DisMAP data](https://apps-st.fisheries.noaa.gov/dismap/DisMAP.html) and NEFSC distribution data disaggregated by adults and juveniles to explore potential environmental effects by maturity stage.
         
-- "**Env_data_by_stock.R**" - .R file used to pull relevant environemntaldata from ecodata package in R, and wrangle data into consistent format to be read in other .r files.
+- "**Env_data_by_stock.R**" - .R file used to pull relevant environemntaldata from [ecodata package](https://github.com/NOAA-EDAB/ecodata) in R, and wrangle data into consistent format to be read in other .r files.
 
 - "**Gam_data_exploration.R**" - .R file containing functions used to check data assumptions and explore data distributions
 
