@@ -14,9 +14,13 @@
 
 - "**Gam_data_exploration.R**" - .R file containing functions used to check data assumptions and explore data distributions
 
+- "**Recruitment_other_data.R**" - exploratory .R file testing GAM recruitment relationships using MENH and DFO data indstead of NEFSC. 
+    - This was done due to speculation that NEFSC data may not represent age 1 data as well as other surveys
+
 - "**SSB_estimates.R**" - .R file estimating SSB using WAA and NAA data form NEFSC trawl survey.
 
-- "**SSB_estimates_other.R**" - exploratory .R file estimating SSB using WAA from NEFSC and NAA data form MENH and DFO surveys *lacks overlap
+- "**SSB_estimates_other.R**" - exploratory .R file estimating SSB using WAA from NEFSC and NAA data form MENH and DFO surveys 
+    - *lacks overlap
 
 - "**cod_distribution.R**" - .R file used for to achieve distribution GAM results
 
@@ -27,6 +31,6 @@
 - "**get_WAA_anomalies.R**" - .R file used for to get weight at age (WAA) anomaly data used in growth analyses.
 
 - "**get_depth_lat.R**" - .R file used get mean depth and latitude data, disaggregated by adults and juvenile groups.
-      - data generated were used in the "DisMAP_vs_adultjuv_raw.R" exploratory analyses.
+    - Data generated were used in the "DisMAP_vs_adultjuv_raw.R" exploratory analyses.
 
 #### Any further questions can be directed to Jamie Behan: jbehan@gmri.org
