@@ -1,6 +1,6 @@
 # Atlantic cod
 
-  <img align="right" src="https://user-images.githubusercontent.com/62613926/204621895-f4fc80a1-f34e-457e-b190-145c6ac58f18.png" width="400" alt="My Image">
+  <img align="right" src="https://user-images.githubusercontent.com/62613926/204640321-e351b50a-f6ee-4bdc-ac44-9687318fb916.png" width="400" alt="My Image">
   
 ### To help identify ecosystem and climate influences on Atlantic cod recruitment, distribution, and growth, generalized additive models (GAMs) were used to examine associations between Atlantic cod population dynamics and environmental variables in the Northwest Atlantic region.
 
