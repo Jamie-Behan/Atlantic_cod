@@ -2,7 +2,7 @@
 
 ### To help identify ecosystem and climate influences on Atlantic cod recruitment, distribution, and growth, generalized additive models (GAMs) were used to examine associations between Atlantic cod population dynamics and environmental variables in the Northwest Atlantic region.
  
-  <img align="right" src="https://user-images.githubusercontent.com/62613926/204602550-da4c662f-d587-4f3a-8e4a-d957d92a8f72.png" width="300" alt="My Image">
+  <img align="right" src="https://user-images.githubusercontent.com/62613926/204621895-f4fc80a1-f34e-457e-b190-145c6ac58f18.png" width="400" alt="My Image">
 
 ### **Included in this Repository is the following:**
 
@@ -21,8 +21,6 @@
 - "**cod_distribution.R**" - .R file used for to achieve distribution GAM results
 
 - "**cod_growth.R**" - .R file used for to achieve growth GAM results
-
-- "**cod_recruitment.R**" - old .R file used for recruitment. updated results are in "cod_recrusitment_NEFSC.R"
 
 - "**cod_recruitment_NEFSC.R**" - .R file used for to achieve recruitment GAM results using NEFSC data.
 
