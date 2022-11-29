@@ -29,8 +29,8 @@ EGOM_recruitment_spring$lAGE1<-(EGOM_recruitment_spring$Age.1)
 WGOM_recruitment_spring$lAGE1<-(WGOM_recruitment_spring$Age.1)
 GBK_recruitment_spring$lAGE1<-(GBK_recruitment_spring$Age.1)
 SNE_recruitment_spring$lAGE1<-(SNE_recruitment_spring$Age.1)
-#add small positive value to all cells to combat cells with 0 values
-#EGOM_recruitment_fall$lAGE1<-EGOM_recruitment_fall[,"lAGE1"]+0.00001
+
+#add +1 to all cells to combat cells with 0 values
 EGOM_recruitment_fall$lAGE1<-EGOM_recruitment_fall[,"lAGE1"]+1
 WGOM_recruitment_fall$lAGE1<-WGOM_recruitment_fall[,"lAGE1"]+1
 GBK_recruitment_fall$lAGE1<-GBK_recruitment_fall[,"lAGE1"]+1
