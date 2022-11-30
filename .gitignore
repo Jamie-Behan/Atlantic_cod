@@ -58,3 +58,6 @@ RMarkdown/
 
 # presentations folder
 presentations/
+
+# making timeseries of raw data
+code/ind_var_timeseries_plots.R
