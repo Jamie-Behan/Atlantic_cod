@@ -5,8 +5,6 @@ here()
 source(here("Code/Gam_data_exploration.R"))
 #### load .csv files #####
 Cod_distribution<-read.csv(here("data/Cod_distribution.csv"))
-#wmfall_ALL<-read.csv(here("data/depth_lat/wmfall_ALL.csv"))
-#wmspring_ALL<-read.csv(here("data/depth_lat/wmspring_ALL.csv"))
 annual_GSI<-read.csv(here("data/annual_GSI.csv"))
 Bottom_temp_fall<-read.csv(here("data/Friedland_fall_mean_bottom_temp_by_stock.csv"))
 Bottom_temp_spring<-read.csv(here("data/Friedland_spring_mean_bottom_temp_by_stock.csv"))
@@ -68,6 +66,7 @@ zoo_Spring_SNE<-zoo_Spring_SNE[c(1,8,9)]
 names(zoo_Spring_SNE)[1] <- "Year"
 zoo_Fall_SNE<-zoo_Fall_SNE[c(1,8,9)]
 names(zoo_Fall_SNE)[1] <- "Year"
+
 #combine zooplankton stock data
 zoo_spring<-list(zoo_Spring_EGOM,zoo_Spring_WGOM,zoo_Spring_GBK,zoo_Spring_SNE)
 zoo_fall<-list(zoo_Fall_EGOM,zoo_Fall_WGOM,zoo_Fall_GBK,zoo_Fall_SNE)
@@ -104,23 +103,14 @@ distribution_spring<-distribution_spring %>% arrange(Year)
 
 ###### Anomaly Base Period########
 ### using 1982-2011 as baseline anomaly period####
-
-#bt_fall_bp<-mean(distribution_fall[1:30,7])
-#bt_spring_bp<-mean(distribution_spring[1:30,7])
-#sst_fall_bp<-mean(distribution_fall[1:30,8])
-#sst_spring_bp<-mean(distribution_spring[1:30,8])
-
 bt_fall_bp<-mean(distribution_fall[1:30,5])
 bt_spring_bp<-mean(distribution_spring[1:30,5])
 sst_fall_bp<-mean(distribution_fall[1:30,6])
 sst_spring_bp<-mean(distribution_spring[1:30,6])
-#####
 ##### Calculate temperature anomaly columns#####
-
 #Fall
 distribution_fall$bt_anomaly<- distribution_fall$Avg_bt  - bt_fall_bp
 distribution_fall$sst_anomaly<- distribution_fall$Avg_oisst  - sst_fall_bp
-
 #Spring
 distribution_spring$bt_anomaly<- distribution_spring$Avg_bt  - bt_spring_bp
 distribution_spring$sst_anomaly<- distribution_spring$Avg_oisst  - sst_spring_bp
