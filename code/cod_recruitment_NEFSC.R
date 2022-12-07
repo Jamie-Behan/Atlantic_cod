@@ -53,16 +53,6 @@ EGOM_recruitment_spring$lAGE1<-log(EGOM_recruitment_spring$lAGE1)
 WGOM_recruitment_spring$lAGE1<-log(WGOM_recruitment_spring$lAGE1)
 GBK_recruitment_spring$lAGE1<-log(GBK_recruitment_spring$lAGE1)
 SNE_recruitment_spring$lAGE1<-log(SNE_recruitment_spring$lAGE1)
-#### remove season columns #####
-EGOM_recruitment_fall<-within(EGOM_recruitment_fall,rm("SEASON"))
-WGOM_recruitment_fall<-within(WGOM_recruitment_fall,rm("SEASON"))
-GBK_recruitment_fall<-within(GBK_recruitment_fall,rm("SEASON"))
-SNE_recruitment_fall<-within(SNE_recruitment_fall,rm("SEASON"))
-
-EGOM_recruitment_spring<-within(EGOM_recruitment_spring,rm("SEASON"))
-WGOM_recruitment_spring<-within(WGOM_recruitment_spring,rm("SEASON"))
-GBK_recruitment_spring<-within(GBK_recruitment_spring,rm("SEASON"))
-SNE_recruitment_spring<-within(SNE_recruitment_spring,rm("SEASON"))
 ##### Start here ######
 source(here("Code/Gam_data_exploration.R"))
 #put dfs in list to apply across functions
@@ -213,10 +203,10 @@ lineplot_seasonal(springdata=SNE_recruitment_spring,
                   ylim=c(0,5))
 #############################################
 ################ GAM FOR-LOOP#####
-GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ){
+GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,number_vars_in_mod){
   
   #create all combinations of predictors
-  predictor_combinations <- lapply(1:length(predictors), FUN = function(x){
+  predictor_combinations <- lapply(1:number_vars_in_mod, FUN = function(x){
     #create combination
     combination <- combn(predictors, m = x) |> as.data.table()
     #add s() to all for gam
@@ -243,8 +233,13 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
   
   ### remove list elements that contain duplicate/correlated independent variables
   ## see correlated_vars character list
-  predictor_combinations <-predictor_combinations[!grepl(correlated_vars1, predictor_combinations$predictor_combinations)| !grepl(correlated_vars2 ,predictor_combinations$predictor_combinations),]
+  predictor_combinations <-predictor_combinations[!grepl("bt_anomaly", predictor_combinations$predictor_combinations)| !grepl("sst_anomaly" ,predictor_combinations$predictor_combinations),]
   
+  if(correlated_vars1!="NA"||correlated_vars2!="NA"){
+    #
+    predictor_combinations <- as.data.frame(predictor_combinations)
+    predictor_combinations <-predictor_combinations[!grepl(correlated_vars1, predictor_combinations$predictor_combinations)| !grepl(correlated_vars2,predictor_combinations$predictor_combinations),]
+  } 
   if(correlated_vars3!="NA"||correlated_vars4!="NA"){
     #
     predictor_combinations <- as.data.frame(predictor_combinations)
@@ -318,9 +313,9 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
 ####EGOM SPRING#####
 targets <- c("RSSB")
 predictors <- colnames(EGOM_recruitment_spring)[!(colnames(EGOM_recruitment_spring) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1","SSB"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly","calfin_100m3","pseudo_100m3")
+#correlated_vars<-c("bt_anomaly","sst_anomaly","calfin_100m3","pseudo_100m3")
 
-GAM_LOOP_FUN(Edata=EGOM_recruitment_spring,k="k=4",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= correlated_vars[3],correlated_vars4=correlated_vars[4],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=EGOM_recruitment_spring,k="k=4",correlated_vars1= "NA",correlated_vars2= "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
@@ -332,38 +327,38 @@ dev.off()
 ######WGOM SPRING#####
 targets <- c("RSSB")
 predictors <- colnames(WGOM_recruitment_spring)[!(colnames(WGOM_recruitment_spring) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1","SSB"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=WGOM_recruitment_spring,k="k=5",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=WGOM_recruitment_spring,k="k=8",correlated_vars1= "NA",correlated_vars2= "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
 hypergrid_tw<-hypergrid_tw[ , !names(hypergrid_tw) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_RSSB/WGOM_spring_recruitment_NEFSC.png",height= 23*nrow(hypergrid_tw), width = 180*ncol(hypergrid_tw))
+png("Figures/Model_run_tables/Recruitment_RSSB/WGOM_spring_recruitment_NEFSC.png",height= 23*nrow(hypergrid_tw), width = 160*ncol(hypergrid_tw))
 grid.table(hypergrid_tw)
 dev.off()
 ######GBK SPRING#####
 targets <- c("RSSB")
 predictors <- colnames(GBK_recruitment_spring)[!(colnames(GBK_recruitment_spring) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1","SSB"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=GBK_recruitment_spring,k="k=6",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=GBK_recruitment_spring,k="k=9",correlated_vars1="NA",correlated_vars2= "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
 hypergrid_tw<-hypergrid_tw[ , !names(hypergrid_tw) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_RSSB/GBK_spring_recruitment_NEFSC.png",height= 23*nrow(hypergrid_tw), width = 170*ncol(hypergrid_tw))
+png("Figures/Model_run_tables/Recruitment_RSSB/GBK_spring_recruitment_NEFSC.png",height= 23*nrow(hypergrid_tw), width = 150*ncol(hypergrid_tw))
 grid.table(hypergrid_tw)
 dev.off()
 
 ######SNE SPRING#####
 targets <- c("RSSB")
 predictors <- colnames(SNE_recruitment_spring)[!(colnames(SNE_recruitment_spring) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1","SSB"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=SNE_recruitment_spring,k="k=3",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=SNE_recruitment_spring,k="k=5",correlated_vars1= "NA",correlated_vars2=  "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
@@ -379,13 +374,13 @@ targets <- c("RSSB")
 predictors <- colnames(EGOM_recruitment_fall)[!(colnames(EGOM_recruitment_fall) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1","SSB"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI","EGOM_hw")
 
-GAM_LOOP_FUN(Edata=EGOM_recruitment_fall,k="k=2",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=EGOM_recruitment_fall,k="k=4",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
 hypergrid_tw<-hypergrid_tw[ , !names(hypergrid_tw) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_RSSB/EGOM_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_tw), width = 138*ncol(hypergrid_tw))
+png("Figures/Model_run_tables/Recruitment_RSSB/EGOM_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_tw), width = 136*ncol(hypergrid_tw))
 grid.table(hypergrid_tw)
 dev.off()
 
@@ -394,13 +389,13 @@ targets <- c("RSSB")
 predictors <- colnames(WGOM_recruitment_fall)[!(colnames(WGOM_recruitment_fall) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1","SSB"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI","EGOM_hw")
 
-GAM_LOOP_FUN(Edata=WGOM_recruitment_fall,k="k=6",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=WGOM_recruitment_fall,k="k=8",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
 hypergrid_tw<-hypergrid_tw[ , !names(hypergrid_tw) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_RSSB/WGOM_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_tw), width = 170*ncol(hypergrid_tw))
+png("Figures/Model_run_tables/Recruitment_RSSB/WGOM_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_tw), width = 160*ncol(hypergrid_tw))
 grid.table(hypergrid_tw)
 dev.off()
 ####GBK FALL#####
@@ -408,13 +403,13 @@ targets <- c("RSSB")
 predictors <- colnames(GBK_recruitment_fall)[!(colnames(GBK_recruitment_fall) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1","SSB"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI")
 
-GAM_LOOP_FUN(Edata=GBK_recruitment_fall,k="k=6",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=GBK_recruitment_fall,k="k=9",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
 hypergrid_tw<-hypergrid_tw[ , !names(hypergrid_tw) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_RSSB/GBK_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_tw), width = 170*ncol(hypergrid_tw))
+png("Figures/Model_run_tables/Recruitment_RSSB/GBK_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_tw), width = 160*ncol(hypergrid_tw))
 grid.table(hypergrid_tw)
 dev.off()
 ####SNE FALL#####
@@ -422,7 +417,7 @@ targets <- c("RSSB")
 predictors <- colnames(SNE_recruitment_fall)[!(colnames(SNE_recruitment_fall) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1","SSB"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI")
 
-GAM_LOOP_FUN(Edata=SNE_recruitment_fall,k="k=4",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=SNE_recruitment_fall,k="k=4",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_tw<-hypergrid
 hypergrid_tw$s.pv<-as.character(hypergrid_tw$s.pv)
 hypergrid_tw<-as.data.frame(hypergrid_tw,stringsAsFactors = F)
@@ -436,37 +431,37 @@ dev.off()
 ####EGOM SPRING#####
 targets <- c("lAGE1")
 predictors <- colnames(EGOM_recruitment_spring)[!(colnames(EGOM_recruitment_spring) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=EGOM_recruitment_spring,k="k=3",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=EGOM_recruitment_spring,k="k=4",correlated_vars1="NA",correlated_vars2= "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_logR1/EGOM_spring_recruitment_NEFSC.png",height= 23*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/Recruitment_logR1/EGOM_spring_recruitment_NEFSC.png",height= 23*nrow(hypergrid_gaus), width = 150*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 ######WGOM SPRING#####
 targets <- c("lAGE1")
 predictors <- colnames(WGOM_recruitment_spring)[!(colnames(WGOM_recruitment_spring) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=WGOM_recruitment_spring,k="k=5",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=WGOM_recruitment_spring,k="k=6",correlated_vars1="NA",correlated_vars2= "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_logR1/WGOM_spring_recruitment_NEFSC.png",height= 23*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/Recruitment_logR1/WGOM_spring_recruitment_NEFSC.png",height= 23*nrow(hypergrid_gaus), width = 160*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 ######GBK SPRING#####
 targets <- c("lAGE1")
 predictors <- colnames(GBK_recruitment_spring)[!(colnames(GBK_recruitment_spring) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=GBK_recruitment_spring,k="k=5",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=GBK_recruitment_spring,k="k=5",correlated_vars1="NA",correlated_vars2= "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
@@ -479,9 +474,9 @@ dev.off()
 ######SNE SPRING#####
 targets <- c("lAGE1")
 predictors <- colnames(SNE_recruitment_spring)[!(colnames(SNE_recruitment_spring) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=SNE_recruitment_spring,k="k=5",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=SNE_recruitment_spring,k="k=5",correlated_vars1="NA",correlated_vars2= "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
@@ -497,13 +492,13 @@ targets <- c("lAGE1")
 predictors <- colnames(EGOM_recruitment_fall)[!(colnames(EGOM_recruitment_fall) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI","EGOM_hw")
 
-GAM_LOOP_FUN(Edata=EGOM_recruitment_fall,k="k=2",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=EGOM_recruitment_fall,k="k=3",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_logR1/EGOM_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/Recruitment_logR1/EGOM_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 160*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 
@@ -512,13 +507,13 @@ targets <- c("lAGE1")
 predictors <- colnames(WGOM_recruitment_fall)[!(colnames(WGOM_recruitment_fall) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI","EGOM_hw")
 
-GAM_LOOP_FUN(Edata=WGOM_recruitment_fall,k="k=5",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=WGOM_recruitment_fall,k="k=6",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_logR1/WGOM_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/Recruitment_logR1/WGOM_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 170*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 ####GBK FALL#####
@@ -526,13 +521,13 @@ targets <- c("lAGE1")
 predictors <- colnames(GBK_recruitment_fall)[!(colnames(GBK_recruitment_fall) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI")
 
-GAM_LOOP_FUN(Edata=GBK_recruitment_fall,k="k=5",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=GBK_recruitment_fall,k="k=7",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/Recruitment_logR1/GBK_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/Recruitment_logR1/GBK_fall_recruitment_NEFSC.png",height= 24*nrow(hypergrid_gaus), width = 170*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 
@@ -541,7 +536,7 @@ targets <- c("lAGE1")
 predictors <- colnames(SNE_recruitment_fall)[!(colnames(SNE_recruitment_fall) %in% c("Age.1","RSSB", "Year","SEASON","lAGE1"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI")
 
-GAM_LOOP_FUN(Edata=SNE_recruitment_fall,k="k=3",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()")
+GAM_LOOP_FUN(Edata=SNE_recruitment_fall,k="k=3",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=tw()",number_vars_in_mod= (length(predictors)-3))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
@@ -554,23 +549,9 @@ dev.off()
 ############# PLOT SIGNIFICANT GAM CURVES #######################
 ##### log(R) (SPRING) vs. potential environmental influences###########
 ##### EGOM ####
-egomLR<-gam(lAGE1 ~ s(pseudo_100m3,k=10)+s(SSB,k=10), family=tw(),method = "REML",data=EGOM_recruitment_spring)
-summary(egomLR)
-egomLR$aic
-
-png("Figures/residual_plots/recruitment/EGOM_spring_logR_NEFSC.png",width = 449, height = 374.5, units = "px",res=90)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(egomLR,pch=20, cex=1,cex.lab=1.3)
-dev.off()
-
-png("Figures/GAM_curves/recruitment/logR1/EGOM_spring_logR_NEFSC2.png",width = 898, height = 374.5, units = "px",res=90)
-layout(matrix(1:2, ncol=2, byrow=TRUE))
-GAM_CURVE_FUN(egomLR,EGOM_recruitment_spring$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on Log Recrutiment",select1=1,data_Year = EGOM_recruitment_spring$Year,position = "bottomleft",title="EGOM Spring")
-GAM_CURVE_FUN(egomLR,EGOM_recruitment_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Log Recrutiment",select1=2,data_Year = EGOM_recruitment_spring$Year,position = "bottomleft",title="EGOM Spring")
-dev.off()
+#nothing
 ##### WGOM ####
-wgomLR<-gam(lAGE1 ~ s(calfin_100m3,k=10), family=tw(),method = "REML",data=WGOM_recruitment_spring)
+wgomLR<-gam(lAGE1 ~ s(WGOM_hw,k=10), family=tw(),method = "REML",data=WGOM_recruitment_spring)
 summary(wgomLR)
 wgomLR$aic
 
@@ -580,25 +561,12 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomLR,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/recruitment/logR1/WGOM_spring_logR_NEFSC2.png",width = 449, height = 374.5, units = "px",res=90)
+png("Figures/GAM_curves/recruitment/logR1/WGOM_spring_logR_NEFSC2.png",width = 449, height = 374.5, units = "px")
 layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(wgomLR,WGOM_recruitment_spring$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on Log Recrutiment",select1=1,data_Year = WGOM_recruitment_spring$Year,position = "bottomleft",title="WGOM Spring")
+GAM_CURVE_FUN(wgomLR,WGOM_recruitment_spring$WGOM_hw,x_lab="Cumulative Heatwave (C)",y_lab="PE on Log Recrutiment",select1=1,data_Year = WGOM_recruitment_spring$Year,position = "bottomleft",title="WGOM Spring")
 dev.off()
 ##### GBK  ####
-gbkLR<-gam(lAGE1 ~ s(calfin_100m3,k=10), family=tw(),method = "REML",data=GBK_recruitment_spring)
-summary(gbkLR)
-gbkLR$aic
-
-png("Figures/residual_plots/recruitment/GBK_spring_logR_NEFSC.png",width = 449, height = 374.5, units = "px",res=90)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(gbkLR,pch=20, cex=1,cex.lab=1.3)
-dev.off()
-
-png("Figures/GAM_curves/recruitment/logR1/GBK_spring_logR_NEFSC.png",width = 449, height = 374.5, units = "px",res=90)
-layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(gbkLR,GBK_recruitment_spring$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on Log Recrutiment",select1=1,data_Year = GBK_recruitment_spring$Year,position = "bottomleft",title="GBK Spring")
-dev.off()
+#nothing
 ##### SNE  ####
 sneLR<-gam(lAGE1 ~ s(bt_anomaly,k=10), family=tw(),method = "REML",data=SNE_recruitment_spring)
 summary(sneLR)
@@ -620,12 +588,12 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(egomLR,pch=20, cex=1,cex.lab=1.3) #Residuals not good
 dev.off()
 
-png("Figures/GAM_curves/recruitment/logR1/EGOM_fall_logR_NEFSC.png",width = 449, height = 374.5, units = "px",res=90)
+png("Figures/GAM_curves/recruitment/logR1/EGOM_fall_logR_NEFSC.png",width = 449, height = 374.5, units = "px")
 layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN(egomLR,EGOM_recruitment_fall$EGOM_hw,x_lab="Mean cumulative Heatwave (Deg C)",y_lab="PE on Log Recruitment",select1=1,data_Year = EGOM_recruitment_fall$Year,position = "bottomleft",title="EGOM Fall")
 dev.off()
 ##### WGOM ####
-wgomLR<-gam(lAGE1 ~ s(sst_anomaly,k=10), family=tw(),method = "REML",data=WGOM_recruitment_fall)
+wgomLR<-gam(lAGE1 ~ s(sst_anomaly,k=10)+s(calfin_100m3,k=10)+s(pseudo_100m3,k=10), family=tw(),method = "REML",data=WGOM_recruitment_fall)
 summary(wgomLR)
 wgomLR$aic
 
@@ -635,29 +603,14 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomLR,pch=20,cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/recruitment/logR1/WGOM_fall_logR_NEFSC2.png",width = 449, height = 374.5, units = "px",res=90)
-layout(matrix(1:1, ncol=1, byrow=TRUE))
+png("Figures/GAM_curves/recruitment/logR1/WGOM_fall_logR_NEFSC2.png",width = 898, height = 749, units = "px")
+layout(matrix(1:4, ncol=2, byrow=TRUE))
 GAM_CURVE_FUN(wgomLR,WGOM_recruitment_fall$sst_anomaly,x_lab="SST Anomaly (Deg C)",y_lab="PE on Log Recruitment",select1=1,data_Year = WGOM_recruitment_fall$Year,position = "bottomleft",title="WGOM Fall")
+GAM_CURVE_FUN(wgomLR,WGOM_recruitment_fall$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on Log Recruitment",select1=2,data_Year = WGOM_recruitment_fall$Year,position = "bottomright",title="WGOM Fall")
+GAM_CURVE_FUN(wgomLR,WGOM_recruitment_fall$calfin_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on Log Recruitment",select1=3,data_Year = WGOM_recruitment_fall$Year,position = "bottomright",title="WGOM Fall")
 dev.off()
 ##### GBK  ####
-corvif(GBK_recruitment_fall[c(5,7,8)])
-
-gbkLR<-gam(lAGE1 ~ s(SSB,k=10)+s(pseudo_100m3,k=10)+s(bt_anomaly,k=10), family=tw(),method = "REML",data=GBK_recruitment_fall)
-summary(gbkLR)
-gbkLR$aic
-
-png("Figures/residual_plots/recruitment/GBK_fall_logR_NEFSC.png",width = 449, height = 374.5, units = "px",res=90)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(gbkLR,pch=20,cex=1,cex.lab=1.3)
-dev.off()
-
-png("Figures/GAM_curves/recruitment/logR1/GBK_fall_logR_NEFSC2.png",width = 898, height = 749, units = "px",res=90)
-layout(matrix(1:4, ncol=2, byrow=TRUE))
-GAM_CURVE_FUN(gbkLR,GBK_recruitment_fall$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Log Recruitment",select1=1,data_Year = GBK_recruitment_fall$Year,position = "bottomleft",title="GBK Fall")
-GAM_CURVE_FUN(gbkLR,GBK_recruitment_fall$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on Log Recruitment",select1=2,data_Year = GBK_recruitment_fall$Year,position = "topleft",title="GBK Fall")
-GAM_CURVE_FUN(gbkLR,GBK_recruitment_fall$bt_anomaly,x_lab="Bottom Tmeperature Anomaly (Deg C)",y_lab="PE on Log Recruitment",select1=3,data_Year = GBK_recruitment_fall$Year,position = "topleft",title="GBK Fall")
-dev.off()
+#nothing
 ##### SNE  ####
 #nothing significant
 sneLR<-gam(lAGE1 ~ s(SSB,k=10), family=tw(),method = "REML",data=SNE_recruitment_fall)
@@ -671,6 +624,10 @@ gam.check(sneLR,pch=20, cex=1,cex.lab=1.3) #bad residuals
 ##### EGOM ####
 #nothing 
 #GSI+bt anomaly not significant at k=10
+#calfin significant but bad residuals
+egomRSSB<-gam(RSSB ~ s(calfin_100m3,k=4), family=tw(),method = "REML",data=EGOM_recruitment_spring)
+summary(egomRSSB)
+egomRSSB$aic
 
 ##### WGOM ####
 wgomRSSB<-gam(RSSB ~ s(Avg_GSI,k=10), family=tw(),method = "REML",data=WGOM_recruitment_spring)
@@ -695,6 +652,10 @@ dev.off()
 ##### RSSB (FALL) vs. potential environmental influences###########
 ##### EGOM ####
 ##Nothing
+egomRSSB<-gam(RSSB ~ s(Avg_GSI,k=10), family=tw(),method = "REML",data=EGOM_recruitment_fall)
+summary(egomRSSB)
+egomRSSB$aic #bad residuals
+
 ##### WGOM ####
 wgomRSSB<-gam(RSSB ~ s(sst_anomaly,k=10), family=tw(),method = "REML",data=WGOM_recruitment_fall)
 summary(wgomRSSB)
@@ -706,7 +667,7 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomRSSB,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/recruitment/RSSB/WGOM_fall_RSSB_NEFSC.png",width = 449, height = 374.5, units = "px",res=90)
+png("Figures/GAM_curves/recruitment/RSSB/WGOM_fall_RSSB_NEFSC.png",width = 449, height = 374.5, units = "px")
 layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN(wgomRSSB,WGOM_recruitment_fall$sst_anomaly,x_lab="SST Anomaly (Deg C)",y_lab="PE on RSSB",select1=1,data_Year = WGOM_recruitment_fall$Year,position = "bottomleft",title="WGOM Fall")
 dev.off()
