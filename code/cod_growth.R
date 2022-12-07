@@ -167,10 +167,10 @@ legend("topright",inset=c(0.02,0.02), legend=c("Age 1", "Age 2","Age 3", "Age 4"
 dev.off()
 
 ################ GAM LOOP FUNCTION#####
-GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ){
+GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,number_vars_in_mod){
   
   #create all combinations of predictors
-  predictor_combinations <- lapply(1:length(predictors), FUN = function(x){
+  predictor_combinations <- lapply(1:number_vars_in_mod, FUN = function(x){
     #create combination
     combination <- combn(predictors, m = x) |> as.data.table()
     #add s() to all for gam
@@ -197,8 +197,13 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
   
   ### remove list elements that contain duplicate/correlated independent variables
   ## see correlated_vars character list
-  predictor_combinations <-predictor_combinations[!grepl(correlated_vars1, predictor_combinations$predictor_combinations)| !grepl(correlated_vars2 ,predictor_combinations$predictor_combinations),]
+  predictor_combinations <-predictor_combinations[!grepl("bt_anomaly", predictor_combinations$predictor_combinations)| !grepl("sst_anomaly" ,predictor_combinations$predictor_combinations),]
   
+  if(correlated_vars1!="NA"||correlated_vars2!="NA"){
+    #
+    predictor_combinations <- as.data.frame(predictor_combinations)
+    predictor_combinations <-predictor_combinations[!grepl(correlated_vars1, predictor_combinations$predictor_combinations)| !grepl(correlated_vars2,predictor_combinations$predictor_combinations),]
+  }
   if(correlated_vars3!="NA"||correlated_vars4!="NA"){
     #
     predictor_combinations <- as.data.frame(predictor_combinations)
@@ -269,13 +274,11 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
 ####Testing Weight at Age & relative K models######
 ####EGOM SPRING#####
 #not enough data
-hist(EGOM_growth_spring$age1_anomaly)
-
 targets <- c("age1_anomaly","K_rel")
 predictors <- colnames(EGOM_growth_spring)[!(colnames(EGOM_growth_spring) %in% c("Year","K_rel","age1_anomaly"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly","calfin_100m3","pseudo_100m3")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=EGOM_growth_spring,k="k=2",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= correlated_vars[3],correlated_vars4=correlated_vars[4],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+GAM_LOOP_FUN(Edata=EGOM_growth_spring,k="k=3",correlated_vars1="NA",correlated_vars2="NA",correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
@@ -290,30 +293,27 @@ targets <- c("age2_anomaly","K_rel")
 predictors <- colnames(EGOM_growth_fall)[!(colnames(EGOM_growth_fall) %in% c("Year","K_rel","age2_anomaly","SSB"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI","EGOM_hw")
 
-GAM_LOOP_FUN(Edata=EGOM_growth_fall,k="k=5",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=gaussian()")
+GAM_LOOP_FUN(Edata=EGOM_growth_fall,k="k=5",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/growth/EGOM_fall_growth.png",height= 24*nrow(hypergrid_gaus), width = 180*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/growth/EGOM_fall_growth.png",height= 24*nrow(hypergrid_gaus), width = 120*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
-
-
-
 ######WGOM SPRING#####
 targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly","K_rel")
 predictors <- colnames(WGOM_growth_spring)[!(colnames(WGOM_growth_spring) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=WGOM_growth_spring,k="k=4",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+GAM_LOOP_FUN(Edata=WGOM_growth_spring,k="k=7",correlated_vars1="NA",correlated_vars2="NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/growth/WGOM_spring_growth.png",height= 23*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/growth/WGOM_spring_growth.png",height= 23*nrow(hypergrid_gaus), width = 160*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 ####WGOM FALL#####
@@ -321,27 +321,27 @@ targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_a
 predictors <- colnames(WGOM_growth_fall)[!(colnames(WGOM_growth_fall) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI","EGOM_hw")
 
-GAM_LOOP_FUN(Edata=WGOM_growth_fall,k="k=4",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=gaussian()")
+GAM_LOOP_FUN(Edata=WGOM_growth_fall,k="k=6",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5=correlated_vars[4],correlated_vars6=correlated_vars[2],folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/growth/WGOM_fall_growth.png",height= 22*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/growth/WGOM_fall_growth.png",height= 22*nrow(hypergrid_gaus), width =150*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 ######GBK SPRING#####
 targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly","K_rel")
 predictors <- colnames(GBK_growth_spring)[!(colnames(GBK_growth_spring) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly")
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
-GAM_LOOP_FUN(Edata=GBK_growth_spring,k="k=4",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+GAM_LOOP_FUN(Edata=GBK_growth_spring,k="k=7",correlated_vars1="NA",correlated_vars2="NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/growth/GBK_spring_growth.png",height= 22*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/growth/GBK_spring_growth.png",height= 22*nrow(hypergrid_gaus), width = 150*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 
@@ -350,32 +350,36 @@ targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_a
 predictors <- colnames(GBK_growth_fall)[!(colnames(GBK_growth_fall) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Avg_GSI")
 
-GAM_LOOP_FUN(Edata=GBK_growth_fall,k="k=4",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3=correlated_vars[1],correlated_vars4=correlated_vars[2],correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()")
+GAM_LOOP_FUN(Edata=GBK_growth_fall,k="k=7",correlated_vars1= correlated_vars[3],correlated_vars2= correlated_vars[1],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
 hypergrid_gaus<-hypergrid
 hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
 
-png("Figures/Model_run_tables/growth/GBK_fall_growth.png",height= 22*nrow(hypergrid_gaus), width = 200*ncol(hypergrid_gaus))
+png("Figures/Model_run_tables/growth/GBK_fall_growth.png",height= 22*nrow(hypergrid_gaus), width =150*ncol(hypergrid_gaus))
 grid.table(hypergrid_gaus)
 dev.off()
 
+######SNE SPRING#####
+targets <- c("K_rel")
+predictors <- colnames(SNE_growth_spring)[!(colnames(SNE_growth_spring) %in% c("Year","K_rel"))]
+#correlated_vars<-c("bt_anomaly","sst_anomaly")
+
+GAM_LOOP_FUN(Edata=SNE_growth_spring,k="k=4",correlated_vars1="NA",correlated_vars2="NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
+hypergrid_gaus<-hypergrid
+hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
+hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
+hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
+
+png("Figures/Model_run_tables/growth/SNE_spring_growth.png",height= 22*nrow(hypergrid_gaus), width = 150*ncol(hypergrid_gaus))
+grid.table(hypergrid_gaus)
+dev.off()
 ############### PLOT SIGNIFICANT WAA GAM CURVES #######################
 ##### WGOM SPRING####
 #age1
-wgom1<-gam(age1_anomaly ~ s(pseudo_100m3,k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
-summary(wgom1)
-wgom1$aic
-png("Figures/residual_plots/growth/WGOM_spring_age1.png",width = 449, height = 374.5, units = "px",res=90)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(wgom1,pch=20, cex=1,cex.lab=1.3)
-dev.off()
-png("Figures/GAM_curves/growth/WGOM_spring_age1.png",width = 449, height = 374.5, units = "px",res=90)
-GAM_CURVE_FUN(wgom1,WGOM_growth_spring$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "bottomright",title="WGOM WAA1 Spring")
-dev.off()
+#nothing significant
 #age2
-wgomWAA2<-gam(age2_anomaly ~ s(SSB, k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
+wgomWAA2<-gam(age2_anomaly ~ s(SSB, k=8)+s(calfin_100m3, k=8)+s(pseudo_100m3,k=8), family=gaussian(),method = "REML",data=WGOM_growth_spring)
 summary(wgomWAA2)
 wgomWAA2$aic
 png("Figures/residual_plots/growth/WGOM_spring_age2.png",width = 449, height = 374.5, units = "px",res=90)
@@ -383,11 +387,29 @@ par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomWAA2,pch=20, cex=1,cex.lab=1.3)
 dev.off()
-png("Figures/GAM_curves/growth/WGOM_spring_age2.png",width = 449, height = 374.5, units = "px",res=90)
-GAM_CURVE_FUN(wgomWAA2,WGOM_growth_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "bottomleft",title="WGOM WAA2 Spring")
+png("Figures/GAM_curves/growth/WGOM_spring_age2.png",width = 898, height =749, units = "px")
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+GAM_CURVE_FUN(wgomWAA2,WGOM_growth_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM WAA2 Spring")
+GAM_CURVE_FUN(wgomWAA2,WGOM_growth_spring$calfin_100m3,x_lab="Calanus (/100m3)",y_lab="PE on WAA Anomaly",select1=2,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM WAA2 Spring")
+GAM_CURVE_FUN(wgomWAA2,WGOM_growth_spring$pseudo_100m3,x_lab="Pseudocalanus (/100m3)",y_lab="PE on WAA Anomaly",select1=3,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM WAA2 Spring")
+dev.off()
+#age3
+wgomWAA3<-gam(age3_anomaly ~ s(WGOM_hw, k=8)+s(calfin_100m3, k=8)+s(pseudo_100m3,k=8), family=gaussian(),method = "REML",data=WGOM_growth_spring)
+summary(wgomWAA3)
+wgomWAA3$aic
+png("Figures/residual_plots/growth/WGOM_spring_age3.png",width = 449, height = 374.5, units = "px",res=90)
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(wgomWAA3,pch=20, cex=1,cex.lab=1.3)
+dev.off()
+png("Figures/GAM_curves/growth/WGOM_spring_age3.png",width = 898, height =749, units = "px")
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+GAM_CURVE_FUN(wgomWAA3,WGOM_growth_spring$WGOM_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM WAA3 Spring")
+GAM_CURVE_FUN(wgomWAA3,WGOM_growth_spring$calfin_100m3,x_lab="Calanus (/100m3)",y_lab="PE on WAA Anomaly",select1=2,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM WAA3 Spring")
+GAM_CURVE_FUN(wgomWAA3,WGOM_growth_spring$pseudo_100m3,x_lab="Pseudocalanus (/100m3)",y_lab="PE on WAA Anomaly",select1=3,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM WAA3 Spring")
 dev.off()
 #age4
-wgomWAA4<-gam(age4_anomaly ~ s(SSB,k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
+wgomWAA4<-gam(age4_anomaly ~ s(Avg_GSI,k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
 summary(wgomWAA4)
 wgomWAA4$aic
 png("Figures/residual_plots/growth/WGOM_spring_age4.png",width = 449, height = 374.5, units = "px",res=90)
@@ -395,11 +417,11 @@ par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomWAA4,pch=20, cex=1,cex.lab=1.3)
 dev.off()
-png("Figures/GAM_curves/growth/WGOM_spring_age4.png",width = 449, height = 374.5, units = "px",res=90)
-GAM_CURVE_FUN(wgomWAA4,WGOM_growth_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "bottom",title="WGOM WAA4 Spring")
+png("Figures/GAM_curves/growth/WGOM_spring_age4.png",width = 449, height = 374.5, units = "px")
+GAM_CURVE_FUN(wgomWAA4,WGOM_growth_spring$Avg_GSI,x_lab="GSI (Δ Deg Lat)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "bottomleft",title="WGOM WAA4 Spring")
 dev.off()
 #age5
-wgomWAA5<-gam(age5_anomaly ~ s(calfin_100m3, k=10)+s(SSB,k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
+wgomWAA5<-gam(age5_anomaly ~ s(WGOM_hw, k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
 summary(wgomWAA5)
 wgomWAA5$aic
 png("Figures/residual_plots/growth/WGOM_spring_age5.png",width = 449, height = 374.5, units = "px",res=90)
@@ -407,13 +429,12 @@ par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomWAA5,pch=20, cex=1,cex.lab=1.3)
 dev.off()
-png("Figures/GAM_curves/growth/WGOM_spring_age5.png",width = 898, height = 374.5, units = "px",res=90)
-layout(matrix(1:2, ncol=2, byrow=FALSE))
-GAM_CURVE_FUN(wgomWAA5,WGOM_growth_spring$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "topright",title="WGOM WAA5 Spring")
-GAM_CURVE_FUN(wgomWAA5,WGOM_growth_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on WAA Anomaly",select1=2,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM WAA5 Spring")
+png("Figures/GAM_curves/growth/WGOM_spring_age5.png",width = 449, height = 374.5, units = "px")
+layout(matrix(1:1, ncol=1, byrow=FALSE))
+GAM_CURVE_FUN(wgomWAA5,WGOM_growth_spring$WGOM_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "bottomleft",title="WGOM WAA5 Spring")
 dev.off()
 #age6
-wgomWAA6<-gam(age6_anomaly ~ s(calfin_100m3,k=7), family=gaussian(),method = "REML",data=WGOM_growth_spring)
+wgomWAA6<-gam(age6_anomaly ~ s(WGOM_hw,k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
 summary(wgomWAA6)
 wgomWAA6$aic
 png("Figures/residual_plots/growth/WGOM_spring_age6.png",width = 449, height = 374.5, units = "px",res=90)
@@ -421,12 +442,12 @@ par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomWAA6,pch=20, cex=1,cex.lab=1.3)
 dev.off()
-png("Figures/GAM_curves/growth/WGOM_spring_age6.png",width = 449, height = 374.5, units = "px",res=90)
-GAM_CURVE_FUN(wgomWAA6,WGOM_growth_spring$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "top",title="WGOM WAA6 Spring")
+png("Figures/GAM_curves/growth/WGOM_spring_age6.png",width = 449, height = 374.5, units = "px")
+GAM_CURVE_FUN(wgomWAA6,WGOM_growth_spring$WGOM_hw,x_lab="CMean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "bottomleft",title="WGOM WAA6 Spring")
 dev.off()
 ##### WGOM FALL####
 #age1
-wgomWAA1<-gam(age1_anomaly ~ s(Avg_GSI,k=10)+s(SSB,k=10), family=gaussian(),method = "REML",data=WGOM_growth_fall)
+wgomWAA1<-gam(age1_anomaly ~ s(Avg_GSI,k=10), family=gaussian(),method = "REML",data=WGOM_growth_fall)
 summary(wgomWAA1)
 wgomWAA1$aic
 png("Figures/residual_plots/growth/WGOM_fall_WAA1.png",width = 449, height = 374.5, units = "px",res=90)
@@ -434,24 +455,9 @@ par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomWAA1,pch=20, cex=1,cex.lab=1.3)
 dev.off()
-png("Figures/GAM_curves/growth/WGOM_fall_age1.png",width = 898, height = 374.5, units = "px",res=90)
-layout(matrix(1:2, ncol=2, byrow=FALSE))
+png("Figures/GAM_curves/growth/WGOM_fall_age1.png",width = 449, height = 374.5, units = "px")
+layout(matrix(1:1, ncol=1, byrow=FALSE))
 GAM_CURVE_FUN(wgomWAA1,WGOM_growth_fall$Avg_GSI,x_lab="Mean GSI (Δ Deg Lat)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_fall$Year,position = "topleft",title="WGOM WAA1 Fall")
-GAM_CURVE_FUN(wgomWAA1,WGOM_growth_fall$SSB,x_lab="SSB (kg/tow)",y_lab="PE on WAA Anomaly",select1=2,data_Year = WGOM_growth_fall$Year,position = "topleft",title="WGOM WAA1 Fall")
-dev.off()
-#age3
-wgomWAA3<-gam(age3_anomaly ~ s(pseudo_100m3,k=8)+s(bt_anomaly,k=8), family=gaussian(),method = "REML",data=WGOM_growth_fall)
-summary(wgomWAA3)
-wgomWAA3$aic
-png("Figures/residual_plots/growth/WGOM_fall_WAA3.png",width = 449, height = 374.5, units = "px",res=90)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(wgomWAA3,pch=20, cex=1,cex.lab=1.3)
-dev.off()
-png("Figures/GAM_curves/growth/WGOM_fall_WAA3.png",width = 898, height = 374.5, units = "px",res=90)
-layout(matrix(1:2, ncol=2, byrow=FALSE))
-GAM_CURVE_FUN(wgomWAA3,WGOM_growth_fall$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_fall$Year,position = "bottomright",title="WGOM WAA3 Fall")
-GAM_CURVE_FUN(wgomWAA3,WGOM_growth_fall$bt_anomaly,x_lab="Bottom Temperature Anomaly (C)",y_lab="PE on WAA Anomaly",select1=2,data_Year = WGOM_growth_fall$Year,position = "bottomright",title="WGOM WAA3 Fall")
 dev.off()
 #age5
 wgomWAA5<-gam(age5_anomaly ~ s(WGOM_hw, k=10), family=gaussian(),method = "REML",data=WGOM_growth_fall)
@@ -466,7 +472,7 @@ dev.off()
 png("Figures/GAM_curves/growth/WGOM_fall_WAA5.png",width = 449, height = 374.5, units = "px")
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(wgomWAA5,WGOM_growth_fall$WGOM_hw,x_lab="Mean Cumulative Heatwave (°C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_fall$Year,position = "bottomleft",title="WGOM WAA5 Fall")
+GAM_CURVE_FUN(wgomWAA5,WGOM_growth_fall$WGOM_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_fall$Year,position = "bottomleft",title="WGOM WAA5 Fall")
 dev.off()
 #####GSI####
 plot(wgomWAA1, select =1, scale =0,ylab = expression(bold("PE on WAA Anomaly")), xlab = expression(bold("Gulf Stream Index (Deg Lat)")), cex.lab=1.6,cex.axis=1.3,col="#00608A",shade = TRUE,shade.col=t_col("#00608A",55,"plot_ylwt"),lwd = 4,lty=2,xlim = c(-0.9,2),ylim = c(-0.5,1.2),rug=FALSE) #plot age 2
@@ -513,7 +519,7 @@ layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN(gbkWAA2,GBK_growth_spring$Avg_GSI,x_lab="GSI (Δ Deg Lat)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA2 Spring")
 dev.off()
 #age3
-gbkWAA3<-gam(age3_anomaly ~ s(pseudo_100m3, k=10)+s(SSB,k=10), family=gaussian(),method = "REML",data=GBK_growth_spring)
+gbkWAA3<-gam(age3_anomaly ~ s(GB_hw, k=10), family=gaussian(),method = "REML",data=GBK_growth_spring)
 summary(gbkWAA3)
 gbkWAA3$aic
 png("Figures/residual_plots/growth/GBK_spring_WAA3.png",width = 449, height = 374.5, units = "px",res=90)
@@ -522,13 +528,12 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(gbkWAA3,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/growth/GBK_spring_WAA3.png",width = 898, height = 374.5, units = "px")
-layout(matrix(1:2, ncol=2, byrow=TRUE))
-GAM_CURVE_FUN(gbkWAA3,GBK_growth_spring$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_spring$Year,position = "topleft",title="GBK WAA3 Spring")
-GAM_CURVE_FUN(gbkWAA3,GBK_growth_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on WAA Anomaly",select1=2,data_Year = GBK_growth_spring$Year,position = "topleft",title="GBK WAA3 Spring")
+png("Figures/GAM_curves/growth/GBK_spring_WAA3.png",width =449, height = 374.5, units = "px")
+layout(matrix(1:1, ncol=1, byrow=TRUE))
+GAM_CURVE_FUN(gbkWAA3,GBK_growth_spring$GB_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA3 Spring")
 dev.off()
 #age4
-gbkWAA4<-gam(age4_anomaly ~ s(Avg_GSI,k=10)+s(calfin_100m3,k=10), family=gaussian(),method = "REML",data=GBK_growth_spring)
+gbkWAA4<-gam(age4_anomaly ~ s(GB_hw,k=10), family=gaussian(),method = "REML",data=GBK_growth_spring)
 summary(gbkWAA4)
 gbkWAA4$aic
 png("Figures/residual_plots/growth/GBK_spring_WAA4.png",width = 449, height = 374.5, units = "px",res=90)
@@ -537,29 +542,39 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(gbkWAA4,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/growth/GBK_spring_WAA4.png",width = 898, height = 374.5, units = "px")
-layout(matrix(1:2, ncol=2, byrow=TRUE))
-GAM_CURVE_FUN(gbkWAA4,GBK_growth_spring$Avg_GSI,x_lab="GSI (Δ Deg Lat)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA4 Spring")
-GAM_CURVE_FUN(gbkWAA4,GBK_growth_spring$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=2,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA4 Spring")
+png("Figures/GAM_curves/growth/GBK_spring_WAA4.png",width =449, height = 374.5, units = "px")
+layout(matrix(1:1, ncol=1, byrow=TRUE))
+GAM_CURVE_FUN(gbkWAA4,GBK_growth_spring$GB_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA4 Spring")
 dev.off()
 #age5
 gbkWAA5<-gam(age5_anomaly ~ s(GB_hw, k=10)+s(calfin_100m3,k=10), family=gaussian(),method = "REML",data=GBK_growth_spring)
 summary(gbkWAA5)
 gbkWAA5$aic
-png("Figures/residual_plots/growth/GBK_spring_WAA5.png",width = 449, height = 374.5, units = "px",res=90)
+png("Figures/residual_plots/growth/GBK_spring_WAA5.png",width = 449, height = 374.5, units = "px")
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(gbkWAA5,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 png("Figures/GAM_curves/growth/GBK_spring_WAA5.png",width = 898, height = 374.5, units = "px")
 layout(matrix(1:2, ncol=2, byrow=TRUE))
-GAM_CURVE_FUN(gbkWAA5,GBK_growth_spring$GB_hw,x_lab="Mean Cumulative Heatwave (°C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA5 Spring")
+GAM_CURVE_FUN(gbkWAA5,GBK_growth_spring$GB_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA5 Spring")
 GAM_CURVE_FUN(gbkWAA5,GBK_growth_spring$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=2,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA5 Spring")
 dev.off()
 
-
-
-
+#age6
+gbkWAA6<-gam(age6_anomaly ~ s(calfin_100m3,k=10), family=gaussian(),method = "REML",data=GBK_growth_spring)
+summary(gbkWAA6)
+gbkWAA6$aic
+png("Figures/residual_plots/growth/GBK_spring_WAA6.png",width = 449, height = 374.5, units = "px",res=90)
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(gbkWAA6,pch=20, cex=1,cex.lab=1.3)
+dev.off()
+png("Figures/GAM_curves/growth/GBK_spring_WAA6.png",width = 449, height = 374.5, units = "px")
+layout(matrix(1:1, ncol=1, byrow=TRUE))
+GAM_CURVE_FUN(gbkWAA6,GBK_growth_spring$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_spring$Year,position = "bottomleft",title="GBK WAA6 Spring")
+dev.off()
+#####################
 png("Figures/GAM_curves/growth/GBK_spring_WAA.png",width = 898, height = 749, units = "px")
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:4, ncol=2, byrow=TRUE))
@@ -600,21 +615,9 @@ dev.off()
 
 ##### GBK FALL####
 #age1
-gbkWAA1<-gam(age1_anomaly ~ s(pseudo_100m3,k=10), family=gaussian(),method = "REML",data=GBK_growth_fall)
-summary(gbkWAA1)
-gbkWAA1$aic
-png("Figures/residual_plots/growth/GBK_fall_WAA1.png",width = 449, height = 374.5, units = "px",res=90)
-par(mar=c(4,4,1,1))
-layout(matrix(1:4, ncol=2, byrow=FALSE))
-gam.check(gbkWAA1,pch=20, cex=1,cex.lab=1.3)
-dev.off()
-png("Figures/GAM_curves/growth/GBK_fall_WAA1.png",width = 449, height = 374.5, units = "px")
-par(mar=c(4.5,4.5,0.6,1))
-layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(gbkWAA1,GBK_growth_fall$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_fall$Year,position = "topleft",title="GBK WAA1 Fall")
-dev.off()
+#nothing significant
 #age2
-gbkWAA2<-gam(age2_anomaly ~ s(pseudo_100m3, k=10), family=gaussian(),method = "REML",data=GBK_growth_fall)
+gbkWAA2<-gam(age2_anomaly ~ s(calfin_100m3, k=10)+s(sst_anomaly,k=10), family=gaussian(),method = "REML",data=GBK_growth_fall)
 summary(gbkWAA2)
 gbkWAA2$aic
 png("Figures/residual_plots/growth/GBK_fall_WAA2.png",width = 449, height = 374.5, units = "px",res=90)
@@ -622,10 +625,11 @@ par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(gbkWAA2,pch=20, cex=1,cex.lab=1.3)
 dev.off()
-png("Figures/GAM_curves/growth/GBK_fall_WAA2.png",width = 449, height = 374.5, units = "px")
+png("Figures/GAM_curves/growth/GBK_fall_WAA2.png",width =898, height = 374.5, units = "px")
 par(mar=c(4.5,4.5,0.6,1))
-layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(gbkWAA2,GBK_growth_fall$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_fall$Year,position = "topleft",title="GBK WAA2 Fall")
+layout(matrix(1:2, ncol=2, byrow=TRUE))
+GAM_CURVE_FUN(gbkWAA2,GBK_growth_fall$calfin_100m3,x_lab="Calanus (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_fall$Year,position = "bottomleft",title="GBK WAA2 Fall")
+GAM_CURVE_FUN(gbkWAA2,GBK_growth_fall$sst_anomaly,x_lab="SST Anomaly (C)",y_lab="PE on WAA Anomaly",select1=2,data_Year = GBK_growth_fall$Year,position = "bottomleft",title="GBK WAA2 Fall")
 dev.off()
 #age3
 gbkWAA3<-gam(age3_anomaly ~ s(GB_hw,k=10), family=gaussian(),method = "REML",data=GBK_growth_fall)
@@ -639,9 +643,23 @@ dev.off()
 png("Figures/GAM_curves/growth/GBK_fall_WAA3.png",width = 449, height = 374.5, units = "px")
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(gbkWAA3,GBK_growth_fall$GB_hw,x_lab="Mean Cumulative Heatwave (°C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_fall$Year,position = "bottomleft",title="GBK WAA3 Fall")
+GAM_CURVE_FUN(gbkWAA3,GBK_growth_fall$GB_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_fall$Year,position = "bottomleft",title="GBK WAA3 Fall")
 dev.off()
-
+#age4
+gbkWAA4<-gam(age4_anomaly ~ s(pseudo_100m3,k=10)+s(sst_anomaly,k=10), family=gaussian(),method = "REML",data=GBK_growth_fall)
+summary(gbkWAA4)
+gbkWAA4$aic
+png("Figures/residual_plots/growth/GBK_fall_WAA4.png",width = 449, height = 374.5, units = "px",res=90)
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(gbkWAA4,pch=20, cex=1,cex.lab=1.3)
+dev.off()
+png("Figures/GAM_curves/growth/GBK_fall_WAA4.png",width =898, height = 374.5, units = "px")
+par(mar=c(4.5,4.5,0.6,1))
+layout(matrix(1:2, ncol=2, byrow=TRUE))
+GAM_CURVE_FUN(gbkWAA4,GBK_growth_fall$pseudo_100m3,x_lab="Pseudocalanus (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_growth_fall$Year,position = "topleft",title="GBK WAA4 Fall")
+GAM_CURVE_FUN(gbkWAA4,GBK_growth_fall$sst_anomaly,x_lab="SST Anomaly (C)",y_lab="PE on WAA Anomaly",select1=2,data_Year = GBK_growth_fall$Year,position = "topleft",title="GBK WAA4 Fall")
+dev.off()
 ################
 png("Figures/GAM_curves/growth/GBK_fall_WAA.png",width = 898, height = 749, units = "px")
 par(mar=c(4.5,4.5,0.6,1))
@@ -694,7 +712,7 @@ dev.off()
 ##### EGOM ####
 #nothing significant for spring
 ##### WGOM ####
-wgomKsp<-gam(K_rel ~ s(Avg_GSI,k=10)+s(calfin_100m3,k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
+wgomKsp<-gam(K_rel ~ s(Avg_GSI,k=10), family=gaussian(),method = "REML",data=WGOM_growth_spring)
 summary(wgomKsp)
 wgomKsp$aic
 
@@ -704,13 +722,12 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomKsp,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/growth/WGOM_spring_relk.png",width = 898, height = 374.5, units = "px",res=90)
-layout(matrix(1:2, ncol=2, byrow=TRUE))
+png("Figures/GAM_curves/growth/WGOM_spring_relk.png",width =449, height = 374.5, units = "px")
+layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN(wgomKsp,WGOM_growth_spring$Avg_GSI,x_lab="Mean GSI (Δ Deg Lat)",y_lab="PE on Relative Condition",select1=1,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM Spring")
-GAM_CURVE_FUN(wgomKsp,WGOM_growth_spring$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on Relative Condition",select1=2,data_Year = WGOM_growth_spring$Year,position = "topleft",title="WGOM Spring")
 dev.off()
 ##### GBK  ####
-gbkK<-gam(K_rel ~ s(Avg_GSI,k=6)+s(GB_hw, k=6)+s(pseudo_100m3,k=6), family=gaussian(),method = "REML",data=GBK_growth_spring)
+gbkK<-gam(K_rel ~ s(pseudo_100m3,k=10)+s(sst_anomaly,k=10), family=gaussian(),method = "REML",data=GBK_growth_spring)
 summary(gbkK)
 gbkK$aic
 
@@ -720,12 +737,10 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(gbkK,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/growth/GBK_spring_relk.png",width = 898, height = 749, units = "px",res=90)
-par(mar=c(4.5,4.5,0.6,1))
-layout(matrix(1:4, ncol=2, byrow=TRUE))
-GAM_CURVE_FUN(gbkK,GBK_growth_spring$Avg_GSI,x_lab="Mean GSI",y_lab="PE on Relative Condition",select1=1,data_Year = GBK_growth_spring$Year,position = "topleft",title="GBK Spring")
-GAM_CURVE_FUN(gbkK,GBK_growth_spring$GB_hw,x_lab="Mean Cumulative Heatwave (°C)",y_lab="PE on Mean Relative Condition",select1=2,data_Year = GBK_growth_spring$Year,position = "topright",title="GBK Spring")
-GAM_CURVE_FUN(gbkK,GBK_growth_spring$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on Mean Relative Condition",select1=3,data_Year = GBK_growth_spring$Year,position = "topleft",title="GBK Spring")
+png("Figures/GAM_curves/growth/GBK_spring_relk.png",width = 898, height = 374.5, units = "px")
+layout(matrix(1:2, ncol=2, byrow=TRUE))
+GAM_CURVE_FUN(gbkK,GBK_growth_spring$pseudo_100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on Mean Relative Condition",select1=1,data_Year = GBK_growth_spring$Year,position = "topleft",title="GBK Spring")
+GAM_CURVE_FUN(gbkK,GBK_growth_spring$sst_anomaly,x_lab="SST Anomaly (C)",y_lab="PE on Mean Relative Condition",select1=2,data_Year = GBK_growth_spring$Year,position = "topleft",title="GBK Spring")
 dev.off()
 ##### SNE  ####
 #nothing significant
@@ -741,9 +756,9 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(egomK,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/growth/EGOM_fall_relk.png",width = 449, height = 374.5, units = "px",res=90)
+png("Figures/GAM_curves/growth/EGOM_fall_relk.png",width = 449, height = 374.5, units = "px")
 layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(egomK,EGOM_growth_fall$bt_anomaly,x_lab="Bottom Temperature Anomaly (°C)",y_lab="PE on Relative Condition",select1=1,data_Year = EGOM_growth_fall$Year,position = "bottomleft",title="EGOM Fall")
+GAM_CURVE_FUN(egomK,EGOM_growth_fall$bt_anomaly,x_lab="Bottom Temperature Anomaly (C)",y_lab="PE on Relative Condition",select1=1,data_Year = EGOM_growth_fall$Year,position = "bottomleft",title="EGOM Fall")
 dev.off()
 ##### WGOM ####
 Wgomk<-gam(K_rel ~ s(Avg_GSI,k=10), family=gaussian(),method = "REML",data=WGOM_growth_fall)
@@ -755,7 +770,7 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(Wgomk,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/growth/WGOM_fall_relk.png",width = 449, height = 374.5, units = "px",res=90)
+png("Figures/GAM_curves/growth/WGOM_fall_relk.png",width = 449, height = 374.5, units = "px")
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN(Wgomk,WGOM_growth_fall$Avg_GSI,x_lab="Mean GSI (Δ Deg Lat)",y_lab="PE on Relative Condition",select1=1,data_Year = WGOM_growth_fall$Year,position = "topleft",title="WGOM Fall")
@@ -771,8 +786,7 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(GBKk,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
-png("Figures/GAM_curves/growth/GBK_fall_relk.png",width = 449, height = 374.5, units = "px",res=90)
-par(mar=c(4.5,4.5,0.6,1))
+png("Figures/GAM_curves/growth/GBK_fall_relk.png",width = 449, height = 374.5, units = "px")
 layout(matrix(1:1, ncol=1, byrow=TRUE))
 GAM_CURVE_FUN(GBKk,GBK_growth_fall$GB_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on Relative Condition",select1=1,data_Year = GBK_growth_fall$Year,position = "topleft",title="GBK Fall")
 dev.off()
