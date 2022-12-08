@@ -443,7 +443,7 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(wgomWAA6,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 png("Figures/GAM_curves/growth/WGOM_spring_age6.png",width = 449, height = 374.5, units = "px")
-GAM_CURVE_FUN(wgomWAA6,WGOM_growth_spring$WGOM_hw,x_lab="CMean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "bottomleft",title="WGOM WAA6 Spring")
+GAM_CURVE_FUN(wgomWAA6,WGOM_growth_spring$WGOM_hw,x_lab="Mean Cumulative Heatwave (C)",y_lab="PE on WAA Anomaly",select1=1,data_Year = WGOM_growth_spring$Year,position = "bottomleft",title="WGOM WAA6 Spring")
 dev.off()
 ##### WGOM FALL####
 #age1
