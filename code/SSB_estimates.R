@@ -1,5 +1,5 @@
 ### Estimating cod SSB outside stock assessment models
-### Approach is to estimate SSB basesd on abuindance of age 6+ fish
+### Approach is to estimate SSB based on abundance of age 4+ fish
 
 
 ### will use numbers at age data from trawl survey to do this
