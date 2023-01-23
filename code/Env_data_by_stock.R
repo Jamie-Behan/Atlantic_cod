@@ -5,12 +5,13 @@ here()
 #### load .csv files #####
 annual_GSI<-read.csv(here("data/annual_GSI.csv"))
 names(annual_GSI)[2] <- "Avg_GSI" 
-Bottom_temp_fall<-read.csv(here("data/Friedland_fall_mean_bottom_temp_by_stock.csv"))
-Bottom_temp_spring<-read.csv(here("data/Friedland_spring_mean_bottom_temp_by_stock.csv"))
+#Bottom_temp_fall<-read.csv(here("data/Friedland_fall_mean_bottom_temp_by_stock.csv"))
+#Bottom_temp_spring<-read.csv(here("data/Friedland_spring_mean_bottom_temp_by_stock.csv"))
 Friedland_OISST_fall<-read.csv(here("data/Friedland_OISST_fall.csv"))
 Friedland_OISST_spring<-read.csv(here("data/Friedland_OISST_spr.csv"))
 cod_NAA<-read.csv(here("data/cod_NAA.csv"))
 cod_heatwave<-as.data.frame(ecodata::ESP_heatwave_cod)
+#SSB Data
 SSB_Fall_EGOM<-read.csv(here("data/SSB_estimates/SSB_Fall_EGOM.csv"))
 names(SSB_Fall_EGOM)[1] <- "Year"
 SSB_Spring_EGOM<-read.csv(here("data/SSB_estimates/SSB_Spring_EGOM.csv"))
@@ -28,33 +29,15 @@ names(SSB_Fall_SNE)[1] <- "Year"
 SSB_Spring_SNE<-read.csv(here("data/SSB_estimates/SSB_Spring_SNE.csv"))
 names(SSB_Spring_SNE)[1] <- "Year"
 ##### zooplankton data#####
-#zoo_Spring_EGOM<-read.csv(here("data/zooplankton/EGOM_spring_zooplankton.csv"))
-#zoo_Fall_EGOM<-read.csv(here("data/zooplankton/EGOM_fall_zooplankton.csv"))
-#zoo_Spring_WGOM<-read.csv(here("data/zooplankton/WGOM_spring_zooplankton.csv"))
-#zoo_Fall_WGOM<-read.csv(here("data/zooplankton/WGOM_fall_zooplankton.csv"))
+#using Spring GB and SNE zooplankton data to best align with spawning timing in those areas
 zoo_Spring_GBK<-read.csv(here("data/zooplankton/GB_spring_zooplankton.csv"))
-#zoo_Fall_GBK<-read.csv(here("data/zooplankton/GB_fall_zooplankton.csv"))
 zoo_Spring_SNE<-read.csv(here("data/zooplankton/SNE_spring_zooplankton.csv"))
-#zoo_Fall_SNE<-read.csv(here("data/zooplankton/SNE_fall_zooplankton.csv"))
-
-#zoo_Spring_EGOM<-zoo_Spring_EGOM[c(1,8,9)]
-#names(zoo_Spring_EGOM)[1] <- "Year"
-#zoo_Fall_EGOM<-zoo_Fall_EGOM[c(1,8,9)]
-#names(zoo_Fall_EGOM)[1] <- "Year"
-#zoo_Spring_WGOM<-zoo_Spring_WGOM[c(1,8,9)]
-#names(zoo_Spring_WGOM)[1] <- "Year"
-#zoo_Fall_WGOM<-zoo_Fall_WGOM[c(1,8,9)]
-#names(zoo_Fall_WGOM)[1] <- "Year"
 zoo_Spring_GBK<-zoo_Spring_GBK[c(1,8,9)]
 names(zoo_Spring_GBK)[1] <- "Year"
-#zoo_Fall_GBK<-zoo_Fall_GBK[c(1,8,9)]
-#names(zoo_Fall_GBK)[1] <- "Year"
 zoo_Spring_SNE<-zoo_Spring_SNE[c(1,8,9)]
 names(zoo_Spring_SNE)[1] <- "Year"
-#zoo_Fall_SNE<-zoo_Fall_SNE[c(1,8,9)]
-#names(zoo_Fall_SNE)[1] <- "Year"
 
-## add summer/winter
+#using summer and winter zooplankton data for GOM to best align with spawning timing in those areas
 zoo_Summer_EGOM<-read.csv(here("data/zooplankton/EGOM_summer_zooplankton.csv"))
 zoo_Winter_EGOM<-read.csv(here("data/zooplankton/EGOM_winter_zooplankton.csv"))
 zoo_Summer_WGOM<-read.csv(here("data/zooplankton/WGOM_summer_zooplankton.csv"))
@@ -123,7 +106,7 @@ WGOM_recruitment_spring$calfin_100m3<-lag(WGOM_recruitment_spring$calfin_100m3)
 WGOM_recruitment_spring$pseudo_100m3<-lag(WGOM_recruitment_spring$pseudo_100m3)
 ### GBK FALL ####
 GBK_recruitment_fall <- list(annual_GSI[24:67,c(1,2)], Bottom_temp_fall[,c(1,3)],Friedland_OISST_fall[,c(1,3)],c_od_heatwave[,c(1,4)],GBK_NAA[ which(GBK_NAA$SEASON=='FALL'),c(1,3)],SSB_Fall_GBK,zoo_Spring_GBK) #put all data frames into list
-GBK_recruitment_fall<-GBK_recruitment_fall %>% reduce(full_join, by='Year')#merge all data frames in list
+GBK_recruitment_fall<-GBK_recruitment_fall %>% reduce(full_join, by='Year')
 GBK_recruitment_fall<-GBK_recruitment_fall[6:45, ]
 GBK_recruitment_fall$calfin_100m3<-lag(GBK_recruitment_fall$calfin_100m3)
 GBK_recruitment_fall$pseudo_100m3<-lag(GBK_recruitment_fall$pseudo_100m3)
