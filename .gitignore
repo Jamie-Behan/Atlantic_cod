@@ -61,3 +61,12 @@ presentations/
 
 # making timeseries of raw data
 code/ind_var_timeseries_plots.R
+
+# paper pdf
+Sugiharaetal.pdf
+
+# friedland vs hubert
+code/Friedland_vs_Hubert.R
+
+# Stock surevy area overlap figure code
+code/Stock_area_survey_overlap.R
