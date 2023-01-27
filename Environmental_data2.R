@@ -570,3 +570,28 @@ rm(list=ls(pattern="SNE"))
 
 
 
+
+########################### calculate distribution data all one stock area ##################
+nm <- list.files(path =here("data/final_env_data/dist_growth"), pattern = ".csv", full.names = TRUE)
+nm2 <- list.files(path =here("data/final_env_data/dist_growth"), pattern = ".csv", full.names =FALSE)
+list2env(lapply(setNames(nm, make.names(gsub("*.csv$", "",nm2))),read.csv),envir=.GlobalEnv)
+rm(nm,nm2)
+
+distribution_spring<-do.call("rbind", list(EGOM_GD_spring,WGOM_GD_spring,GBK_GD_spring,SNE_GD_spring))
+distribution_spring<-aggregate(distribution_spring[,2:9], list(distribution_spring$Year), mean,na.rm=TRUE)
+is.nan.data.frame <- function(x)
+  do.call(cbind, lapply(x, is.nan))
+distribution_spring[is.nan(distribution_spring)]<-NA
+names(distribution_spring)[1]<-"Year"
+
+distribution_fall<-do.call("rbind", list(EGOM_GD_fall,WGOM_GD_fall,GBK_GD_fall,SNE_GD_fall))
+distribution_fall<-aggregate(distribution_fall[,2:9], list(distribution_fall$Year), mean,na.rm=TRUE)
+distribution_fall[is.nan(distribution_fall)]<-NA
+names(distribution_fall)[1]<-"Year"
+
+#drom age1 and SSB columns from df
+distribution_spring[1:(length(distribution_spring)-2)]
+distribution_fall[1:(length(distribution_fall)-2)]
+#save distribution df's
+#write.csv(distribution_spring, here("data/final_env_data/distribution/distribution_spring.csv"), row.names=FALSE)
+#write.csv(distribution_fall, here("data/final_env_data/distribution/distribution_fall.csv"), row.names=FALSE)
