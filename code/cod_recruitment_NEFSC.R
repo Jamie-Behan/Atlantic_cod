@@ -564,10 +564,10 @@ GAM_CURVE_FUN(egomLR,EGOM_recruitment_spring$sst_anomaly,x_lab="SST Anomaly (C)"
 GAM_CURVE_FUN(egomLR,EGOM_recruitment_spring$calfin_100m3,x_lab="Calanus Abundance (/100m3)",y_lab="PE on Log Recrutiment",select1=2,data_Year = EGOM_recruitment_spring$Year,position = "bottomleft",title=NULL)
 dev.off()
 ##### WGOM ####
+
 wgomLR<-gam(lAGE1 ~ s(Heatwave,k=10), family=tw(),method = "REML",data=WGOM_recruitment_spring)
 summary(wgomLR)
 wgomLR$aic
-
 png("Figures/residual_plots/recruitment/WGOM_spring_logR_NEFSC.png",width = 449, height = 374.5, units = "px",res=90)
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
