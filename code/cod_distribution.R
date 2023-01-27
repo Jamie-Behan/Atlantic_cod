@@ -4,124 +4,36 @@ pacman::p_load(here, readxl,lubridate,stats,graphics,Hmisc,data.table,utils,mgcv
 here()
 source(here("Code/Gam_data_exploration.R"))
 #### load .csv files #####
+nm <- list.files(path =here("data/final_env_data/distribution"), pattern = ".csv", full.names = TRUE)
+nm2 <- list.files(path =here("data/final_env_data/distribution"), pattern = ".csv", full.names =FALSE)
+list2env(lapply(setNames(nm, make.names(gsub("*.csv$", "",nm2))),read.csv),envir=.GlobalEnv)
+rm(nm,nm2)
+
 Cod_distribution<-read.csv(here("data/Cod_distribution.csv"))
-annual_GSI<-read.csv(here("data/annual_GSI.csv"))
-Bottom_temp_fall<-read.csv(here("data/Friedland_fall_mean_bottom_temp_by_stock.csv"))
-Bottom_temp_spring<-read.csv(here("data/Friedland_spring_mean_bottom_temp_by_stock.csv"))
-Friedland_OISST_fall<-read.csv(here("data/Friedland_OISST_fall.csv"))
-Friedland_OISST_spring<-read.csv(here("data/Friedland_OISST_spr.csv"))
 SSB_Fall_all<-read.csv(here("data/SSB_estimates/SSB_Fall_all.csv"))
 names(SSB_Fall_all)[1] <- "Year"
 SSB_Spring_all<-read.csv(here("data/SSB_estimates/SSB_Spring_all.csv"))
 names(SSB_Spring_all)[1] <- "Year"
-##### Get cod heatwave data ####
-cod_heatwave<-as.data.frame(ecodata::ESP_heatwave_cod)
-#EGOM
-EGOM_chw<-cod_heatwave[(cod_heatwave$stock_id == "EGOM") & (cod_heatwave$Var == "cumulative intensity"), ]
-names(EGOM_chw)[3] <- "EGOM_hw"
-EGOM_chw <- EGOM_chw[, -c(2,4:5)]
-#WGOM
-WGOM_chw<-cod_heatwave[(cod_heatwave$stock_id == "WGOM") & (cod_heatwave$Var == "cumulative intensity"), ]
-names(WGOM_chw)[3] <- "WGOM_hw"
-WGOM_chw <- WGOM_chw[, -c(2,4:5)]
-#GB
-GB_chw<-cod_heatwave[(cod_heatwave$stock_id == "GBK") & (cod_heatwave$Var == "cumulative intensity"), ]
-names(GB_chw)[3] <- "GB_hw"
-GB_chw <- GB_chw[, -c(2,4:5)]
-#SNE
-SNE_chw<-cod_heatwave[(cod_heatwave$stock_id == "SNE") & (cod_heatwave$Var == "cumulative intensity"), ]
-names(SNE_chw)[3] <- "SNE_hw"
-SNE_chw <- SNE_chw[, -c(2,4:5)]
 
-cod_heatwave<-merge(EGOM_chw,WGOM_chw,merge="Time",all=TRUE)
-cod_heatwave<-merge(cod_heatwave,GB_chw,merge="Time",all=TRUE)
-cod_heatwave<-merge(cod_heatwave,SNE_chw,merge="Time",all=TRUE)
-
-cod_heatwave$mean_c_heatwave <- rowMeans(cod_heatwave[,2:5],na.rm=TRUE)
-names(cod_heatwave)[1] <- "Year"
-rm(EGOM_chw,GB_chw,WGOM_chw,SNE_chw)
-##### zooplankton data#####
-zoo_Summer_EGOM<-read.csv(here("data/zooplankton/EGOM_summer_zooplankton.csv"))
-zoo_Winter_EGOM<-read.csv(here("data/zooplankton/EGOM_winter_zooplankton.csv"))
-zoo_Summer_WGOM<-read.csv(here("data/zooplankton/WGOM_summer_zooplankton.csv"))
-zoo_Winter_WGOM<-read.csv(here("data/zooplankton/WGOM_winter_zooplankton.csv"))
-zoo_Summer_GBK<-read.csv(here("data/zooplankton/GB_summer_zooplankton.csv"))
-zoo_Winter_GBK<-read.csv(here("data/zooplankton/GB_winter_zooplankton.csv"))
-zoo_Summer_SNE<-read.csv(here("data/zooplankton/SNE_summer_zooplankton.csv"))
-zoo_Winter_SNE<-read.csv(here("data/zooplankton/SNE_winter_zooplankton.csv"))
-
-zoo_Summer_EGOM<-zoo_Summer_EGOM[c(2,9,10)]
-names(zoo_Summer_EGOM)[1] <- "Year"
-zoo_Winter_EGOM<-zoo_Winter_EGOM[c(2,9,10)]
-names(zoo_Winter_EGOM)[1] <- "Year"
-zoo_Summer_WGOM<-zoo_Summer_WGOM[c(2,9,10)]
-names(zoo_Summer_WGOM)[1] <- "Year"
-zoo_Winter_WGOM<-zoo_Winter_WGOM[c(2,9,10)]
-names(zoo_Winter_WGOM)[1] <- "Year"
-zoo_Summer_GBK<-zoo_Summer_GBK[c(2,9,10)]
-names(zoo_Summer_GBK)[1] <- "Year"
-zoo_Winter_GBK<-zoo_Winter_GBK[c(2,9,10)]
-names(zoo_Winter_GBK)[1] <- "Year"
-zoo_Summer_SNE<-zoo_Summer_SNE[c(2,9,10)]
-names(zoo_Summer_SNE)[1] <- "Year"
-zoo_Winter_SNE<-zoo_Winter_SNE[c(2,9,10)]
-names(zoo_Winter_SNE)[1] <- "Year"
-
-#combine zooplankton stock data
-zoo_summer<-list(zoo_Summer_EGOM,zoo_Summer_WGOM,zoo_Summer_GBK,zoo_Summer_SNE)
-zoo_winter<-list(zoo_Winter_EGOM,zoo_Winter_WGOM,zoo_Winter_GBK,zoo_Winter_SNE)
-zoo_summer<-zoo_summer %>% reduce(full_join, by=c('Year'))
-zoo_winter<-zoo_winter %>% reduce(full_join, by=c('Year'))
-zoo_summer$pseudo100m3<-rowMeans(zoo_summer[,c(3,5,7,9)], na.rm=T)
-zoo_summer$calfin100m3<-rowMeans(zoo_summer[,c(2,4,6,8)], na.rm=T)
-zoo_winter$pseudo100m3<-rowMeans(zoo_winter[,c(3,5,7,9)], na.rm=T)
-zoo_winter$calfin100m3<-rowMeans(zoo_winter[,c(2,4,6,8)], na.rm=T)
-zoo_summer<-zoo_summer[c(1,10,11)]
-zoo_winter<-zoo_winter[c(1,10,11)]
-zoo_summer$pseudo100m3<-lag(zoo_summer$pseudo100m3)
-zoo_summer$calfin100m3<-lag(zoo_summer$calfin100m3)
-zoo_winter$pseudo100m3<-lag(zoo_winter$pseudo100m3)
-zoo_winter$calfin100m3<-lag(zoo_winter$calfin100m3)
 ####Combine data into separate data frames by season####
-distribution_fall <- list(Cod_distribution[,c(1,4,5)], annual_GSI, Bottom_temp_fall[,c(1,6)],Friedland_OISST_fall[,c(1,6)],cod_heatwave[,c(1,6)],SSB_Fall_all[,c(1,3)],zoo_winter)
-#merge all data frames in list
+distribution_fall <- list(Cod_distribution[,c(1,4,5)],distribution_fall,SSB_Fall_all[,c(1,3)])
 distribution_fall<-distribution_fall %>% reduce(full_join, by='Year')
-names(distribution_fall)[4] <- "Avg_GSI"
 
-distribution_spring <- list(Cod_distribution[,c(1,2,3)], annual_GSI, Bottom_temp_spring[,c(1,6)],Friedland_OISST_spring[,c(1,6)],cod_heatwave[,c(1,6)],SSB_Spring_all[,c(1,3)],zoo_summer)
+distribution_spring <- list(Cod_distribution[,c(1,2,3)],distribution_spring,SSB_Spring_all[,c(1,3)])
 distribution_spring<-distribution_spring %>% reduce(full_join, by='Year')
-names(distribution_spring)[4] <- "Avg_GSI"
-### remove data I don't need ####
-rm(annual_GSI,Bottom_temp_fall,Bottom_temp_spring,Friedland_OISST_fall,Friedland_OISST_spring,cod_heatwave,SSB_Fall_all,SSB_Spring_all,wmfall_ALL,wmspring_ALL,Cod_distribution,zoo_Winter_EGOM,zoo_Winter_GBK,zoo_Winter_SNE,zoo_Winter_WGOM,zoo_Summer_EGOM,zoo_Summer_GBK,zoo_Summer_SNE,zoo_Summer_WGOM,zoo_summer,zoo_winter)
 
+### remove data I don't need ####
+rm(Cod_distribution,SSB_Fall_all,SSB_Spring_all)
 ###clip to years with most data###
 distribution_fall = distribution_fall[!distribution_fall$Year > 2021,]
 distribution_fall = distribution_fall[!distribution_fall$Year < 1982,]
 distribution_spring = distribution_spring[!distribution_spring$Year > 2021,]
 distribution_spring = distribution_spring[!distribution_spring$Year < 1982,]
-
 ###reorder by year###
 distribution_fall<-distribution_fall %>% arrange(Year)
 distribution_spring<-distribution_spring %>% arrange(Year)
-
-###### Anomaly Base Period########
-### using 1982-2011 as baseline anomaly period####
-bt_fall_bp<-mean(distribution_fall[1:30,5])
-bt_spring_bp<-mean(distribution_spring[1:30,5])
-sst_fall_bp<-mean(distribution_fall[1:30,6])
-sst_spring_bp<-mean(distribution_spring[1:30,6])
-##### Calculate temperature anomaly columns#####
-#Fall
-distribution_fall$bt_anomaly<- distribution_fall$Avg_bt  - bt_fall_bp
-distribution_fall$sst_anomaly<- distribution_fall$Avg_oisst  - sst_fall_bp
-#Spring
-distribution_spring$bt_anomaly<- distribution_spring$Avg_bt  - bt_spring_bp
-distribution_spring$sst_anomaly<- distribution_spring$Avg_oisst  - sst_spring_bp
-
 ###Get final dataframes ####
-distribution_fall<-distribution_fall[,c(1:4,7:12)]
 distribution_fall$COG_depth_fall<-abs(distribution_fall$COG_depth_fall)
-distribution_spring<-distribution_spring[,c(1:4,7:12)]
 distribution_spring$COG_depth_spring<-abs(distribution_spring$COG_depth_spring)
 #########################
 ############ START ANALYSIS ##################
@@ -132,12 +44,10 @@ df.list <- list(distribution_fall,distribution_spring)
 lapply(df.list, dotchart_fun_10)
 lapply(df.list, hist_fun10)
 lapply(df.list, view_boxplot_fun10)
-lapply(df.list, shapiro_fun) #all normal except SSB and heatwave
-#lapply(df.list,Mypairs)
+lapply(df.list, shapiro_fun)
+
 Mypairs(distribution_fall[4:10])
-#gsi & bt, pseudo & bt, hw & sst, and bt & sst are correlated
 Mypairs(distribution_spring[4:10])
-#sst & bt are correlated
 #############################################
 ################ GAM loop#####
 GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,number_vars_in_mod){
@@ -247,9 +157,9 @@ hypergrid<- dplyr::arrange(hypergrid, hypergrid$target, desc(hypergrid$AIC))
 ############Gaussian###################
 targets <- c("COG_Lat_fall","COG_depth_fall")
 predictors <- colnames(distribution_fall)[!(colnames(distribution_fall) %in% c("COG_Lat_fall","COG_depth_fall", "Year"))]
-correlated_vars<-c("bt_anomaly","sst_anomaly","mean_c_heatwave","Avg_GSI")
+correlated_vars<-c("bt_anomaly","sst_anomaly","Heatwave","GSI")
 
-GAM_LOOP_FUN(Edata=distribution_fall,k="k=8",correlated_vars1="NA",correlated_vars2= "NA",correlated_vars3= correlated_vars[4],correlated_vars4= correlated_vars[1],correlated_vars5= correlated_vars[3],correlated_vars6= correlated_vars[2],folder_name="cod_fall_depth",familyXYZ= "family=gaussian()",number_vars_in_mod = (length(predictors)-4))
+GAM_LOOP_FUN(Edata=distribution_fall,k="k=10",correlated_vars1=correlated_vars[1],correlated_vars2=correlated_vars[3],correlated_vars3=correlated_vars[2],correlated_vars4=correlated_vars[3],correlated_vars5=correlated_vars[1],correlated_vars6=correlated_vars[4],folder_name="cod_fall_depth",familyXYZ= "family=gaussian()",number_vars_in_mod = (length(predictors)-4))
 hypergrid$s.pv<-as.character(hypergrid$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
@@ -262,9 +172,9 @@ dev.off()
 ############Gaussian###################
 targets <- c("COG_Lat_spring","COG_depth_spring")
 predictors <- colnames(distribution_spring)[!(colnames(distribution_spring) %in% c("COG_Lat_spring","COG_depth_spring", "Year"))]
-#correlated_vars<-c("bt_anomaly","sst_anomaly")
+correlated_vars<-c("bt_anomaly","sst_anomaly","SSB","calfin_100m3","pseudo_100m3","GSI")
 
-GAM_LOOP_FUN(Edata=distribution_spring,k="k=8",correlated_vars1= "NA",correlated_vars2= "NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="cod_spring_lat",familyXYZ= "family=gaussian()",number_vars_in_mod = (length(predictors)-4))
+GAM_LOOP_FUN(Edata=distribution_spring,k="k=10",correlated_vars1=correlated_vars[2],correlated_vars2=correlated_vars[3],correlated_vars3=correlated_vars[4],correlated_vars4=correlated_vars[5],correlated_vars5=correlated_vars[1],correlated_vars6=correlated_vars[6],folder_name="cod_spring_lat",familyXYZ= "family=gaussian()",number_vars_in_mod = (length(predictors)-4))
 hypergrid$s.pv<-as.character(hypergrid$s.pv)
 hypergrid_gaus<-as.data.frame(hypergrid,stringsAsFactors = F)
 hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
@@ -275,8 +185,7 @@ dev.off()
 
 ############# PLOT SIGNIFICANT GAM CURVES #######################
 ##### DEPTH (Fall) vs. potential environmental influences###########
-#nothing significant
-FL_Depth<-gam(abs(COG_depth_fall) ~ s(pseudo100m3, k=10), family=tw(),method = "REML",data=distribution_fall)
+FL_Depth<-gam(abs(COG_depth_fall) ~ s(calfin_100m3, k=10), family=tw(),method = "REML",data=distribution_fall)
 summary(FL_Depth)
 FL_Depth$aic
 
@@ -288,14 +197,26 @@ dev.off()
 
 png("Figures/GAM_curves/distribution/Fall_Depth.png",width = 449, height = 374.5, units = "px")
 layout(matrix(1:1, ncol=1, byrow=FALSE))
-GAM_CURVE_FUN(FL_Depth,distribution_fall$pseudo100m3,x_lab="Pseudocalanus Density (/100m3)",y_lab="PE on Mean Depth",select1=1,data_Year = distribution_fall$Year,position = "topleft",title="Fall Depth")
+GAM_CURVE_FUN(FL_Depth,distribution_fall$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on Mean Depth",select1=1,data_Year = distribution_fall$Year,position = "topright",title="Fall Depth")
 dev.off()
 ##### DEPTH (Spring tow) vs. potential environmental influences##########
-#nothing
-##### LATITUDE (Fall) vs. potential environmental influences###########
+SP_Depth<-gam(abs(COG_depth_spring) ~ s(SSB, k=10), family=tw(),method = "REML",data=distribution_spring)
+summary(SP_Depth)
+SP_Depth$aic
 
-FL_Lat<-gam((COG_Lat_fall) ~ s(pseudo100m3,k=10)+s(SSB, k=10), family=gaussian(),method = "REML",data=distribution_fall)
-summary(FL_Lat) # Find significant variables based on p-value
+png("Figures/residual_plots/distribution/Spring_Depth.png",width = 449, height = 374.5, units = "px",res=90)
+par(mar=c(4,4,1,1))
+layout(matrix(1:4, ncol=2, byrow=FALSE))
+gam.check(SP_Depth,pch=20, cex=1,cex.lab=1.3)
+dev.off()
+
+png("Figures/GAM_curves/distribution/Spring_Depth.png",width = 449, height = 374.5, units = "px")
+layout(matrix(1:1, ncol=1, byrow=FALSE))
+GAM_CURVE_FUN(SP_Depth,distribution_spring$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Depth",select1=1,data_Year = distribution_spring$Year,position = "bottomleft",title="Spring Depth")
+dev.off()
+##### LATITUDE (Fall) vs. potential environmental influences###########
+FL_Lat<-gam((COG_Lat_fall) ~ s(SSB,k=10), family=gaussian(),method = "REML",data=distribution_fall)
+summary(FL_Lat)
 FL_Lat$aic
 
 png("Figures/residual_plots/distribution/Fall_Lat.png",width = 449, height = 374.5, units = "px",res=90)
@@ -305,14 +226,13 @@ gam.check(FL_Lat,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 
 ###Plot GAM
-png("Figures/GAM_curves/distribution/Fall_Lat.png",width = 898, height = 374.5, units = "px")
-layout(matrix(1:2, ncol=2, byrow=FALSE))
-GAM_CURVE_FUN(FL_Lat,distribution_fall$pseudo100m3,x_lab="Pseudocalanus (/100m3)",y_lab="PE on Mean Latitude",select1=1,data_Year = distribution_spring$Year,position="topleft",title="Fall Latitude")
-GAM_CURVE_FUN(FL_Lat,distribution_fall$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Latitude",select1=2,data_Year = distribution_spring$Year,position="bottomleft",title="Fall Latitude")
+png("Figures/GAM_curves/distribution/Fall_Lat.png",width =449, height = 374.5, units = "px")
+layout(matrix(1:1, ncol=1, byrow=FALSE))
+GAM_CURVE_FUN(FL_Lat,distribution_fall$SSB,x_lab="SSB (kg/tow)",y_lab="PE on Mean Latitude",select1=1,data_Year = distribution_spring$Year,position="topleft",title="Fall Latitude")
 dev.off()
 
 ##### Latitude (Spring tow) vs. potential environmental influences##########
-SP_numtow<-gam((COG_Lat_spring) ~ s(calfin100m3, k=10)+s(Avg_GSI,k=10), family=gaussian(),method = "REML",data=distribution_spring)
+SP_numtow<-gam((COG_Lat_spring) ~ s(Heatwave, k=10), family=gaussian(),method = "REML",data=distribution_spring)
 summary(SP_numtow)
 SP_numtow$aic
 
@@ -322,26 +242,8 @@ layout(matrix(1:4, ncol=2, byrow=FALSE))
 gam.check(SP_numtow,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 ###Plot GAM
-png("Figures/GAM_curves/distribution/Spring_Lat.png",width = 898, height = 374.5, units = "px")
+png("Figures/GAM_curves/distribution/Spring_Lat.png",width =449, height = 374.5, units = "px")
 par(mar=c(4.5,4.3,1,1))
-layout(matrix(1:2, ncol=2, byrow=FALSE))
-GAM_CURVE_FUN(SP_numtow,distribution_spring$calfin100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on Mean Latitude",select1=1,data_Year = distribution_spring$Year,position="topleft",title="Spring Latitude")
-GAM_CURVE_FUN(SP_numtow,distribution_spring$calfin100m3,x_lab="GSI (Δ Deg Lat)",y_lab="PE on Mean Latitude",select1=2,data_Year = distribution_spring$Year,position="topleft",title="Spring Latitude")
-dev.off()
-
-
-##### Combined Pseduocalanus plots for spring and fall depth #####
-png("Figures/GAM_curves/distribution/Depth_pseudo.png",width = 449, height = 374.5, units = "px")
-par(mar=c(4.5,4.5,3,1))
-plot(FL_Depth, select =1, scale =0,ylab = expression("PE on Mean Depth"), xlab = expression("Pseudocalanus Density (/100m3)"), cex.lab=1.6,cex.axis=1.3,col="#00608A",shade = TRUE,shade.col=t_col("#00608A",70,"plot_ylwt"),lwd = 4,lty=1,xlim = c(-1,1),ylim = c(-0.65,0.5),rug=FALSE,main= "Fall & Spring Depth",cex.main=2)
-rug(distribution_fall$pseudo100m3, ticksize = 0.05, side = 1, lwd = 2.5, col = "#00608A")
-abline(h=0, lty=2, col="black", lwd=2.0)
-par(new = TRUE) 
-plot(SP_Depth, select =1, scale =0,ylab = "", xlab = "",col="#535353",axes = FALSE,shade = TRUE,
-     shade.col=t_col("#535353",70,"plot_red"),lwd = 4,lty=1,xlim = c(-1,1),ylim = c(-0.65,0.5),rug=FALSE)
-rug(distribution_spring$pseudo100m3, ticksize = 0.05, side = 1, lwd = 2.5, col = "#535353")
-legend("topleft", inset=0.04, # position
-       legend = c("Fall","Spring"),col = c("#00608A","#535353"),
-       cex = 1,lwd = c(4,4),lty = c(2,2),text.col = "black",
-       box.col = "black",box.lty=1, box.lwd=1,bty = "o",bg="gray95") # border
+layout(matrix(1:1, ncol=1, byrow=FALSE))
+GAM_CURVE_FUN(SP_numtow,distribution_spring$Heatwave,x_lab="Heatwave (C)",y_lab="PE on Mean Latitude",select1=1,data_Year = distribution_spring$Year,position="topleft",title="Spring Latitude")
 dev.off()
