@@ -48,6 +48,7 @@ lapply(df.list, shapiro_fun)
 
 Mypairs(distribution_fall[4:10])
 Mypairs(distribution_spring[4:10])
+
 #############################################
 ################ GAM loop#####
 GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,number_vars_in_mod){
@@ -185,9 +186,12 @@ dev.off()
 
 ############# PLOT SIGNIFICANT GAM CURVES #######################
 ##### DEPTH (Fall) vs. potential environmental influences###########
-FL_Depth<-gam(abs(COG_depth_fall) ~ s(calfin_100m3, k=10), family=tw(),method = "REML",data=distribution_fall)
+FL_Depth<-gam(abs(COG_depth_fall) ~ s(calfin_100m3, k=10), family=gaussian(),method = "REML",data=distribution_fall)
 summary(FL_Depth)
 FL_Depth$aic
+
+plot(influence.gam(FL_Depth))
+abline(h = 4/nrow(distribution_fall), lty = 2, col = "red") # add cutoff line
 
 png("Figures/residual_plots/distribution/Fall_Depth.png",width = 449, height = 374.5, units = "px",res=90)
 par(mar=c(4,4,1,1))
@@ -200,7 +204,7 @@ layout(matrix(1:1, ncol=1, byrow=FALSE))
 GAM_CURVE_FUN(FL_Depth,distribution_fall$calfin_100m3,x_lab="Calanus Density (/100m3)",y_lab="PE on Mean Depth",select1=1,data_Year = distribution_fall$Year,position = "topright",title="Fall Depth")
 dev.off()
 ##### DEPTH (Spring tow) vs. potential environmental influences##########
-SP_Depth<-gam(abs(COG_depth_spring) ~ s(SSB, k=10), family=tw(),method = "REML",data=distribution_spring)
+SP_Depth<-gam(abs(COG_depth_spring) ~ s(SSB, k=10), family=gaussian(),method = "REML",data=distribution_spring)
 summary(SP_Depth)
 SP_Depth$aic
 
