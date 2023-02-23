@@ -1,6 +1,6 @@
 ### Estimating cod SSB outside stock assessment models
 ### Approach is to estimate SSB based on abundance of age 4+ fish
-
+library(here)
 
 ### will use numbers at age data from trawl survey to do this
 Cod_NAA<-read.csv(here("data/cod_NAA.csv"))
@@ -136,3 +136,13 @@ SSB_Spring_SNE<-SSB_SNE[SSB_SNE$SEASON =="SPRING",]
 #write.csv(SSB_Fall_SNE,here("data/SSB_estimates/SSB_Fall_SNE.csv"), row.names = FALSE)
 #write.csv(SSB_Spring_SNE,here("data/SSB_estimates/SSB_Spring_SNE.csv"), row.names = FALSE)
 
+#plot ssb estimates by stock area and region
+par(mar=c(2,4,2,1), mfrow=c(2,4))
+plot(SSB_Fall_EGOM$YEAR,SSB_Fall_EGOM$SSB, type="l",ylim=c(0,20),xlim=c(1982,2019),ylab="SSB",lwd=3,col="#00608A",main="Fall EGOM")
+plot(SSB_Fall_WGOM$YEAR,SSB_Fall_WGOM$SSB, type="l",ylim=c(0,20),xlim=c(1982,2019),ylab="SSB",lwd=3,col="#00608A",main="Fall WGOM")
+plot(SSB_Fall_GBK$YEAR,SSB_Fall_GBK$SSB, type="l",ylim=c(0,20),xlim=c(1982,2019),ylab="SSB",lwd=3,col="#00608A",main="Fall GBK")
+plot(SSB_Fall_SNE$YEAR,SSB_Fall_SNE$SSB, type="l",ylim=c(0,20),xlim=c(1982,2019),ylab="SSB",lwd=3,col="#00608A",main="Fall SNE")
+plot(SSB_Spring_EGOM$YEAR,SSB_Spring_EGOM$SSB, type="l",ylim=c(0,20),xlim=c(1982,2019),ylab="SSB",lwd=3,col="#00608A",main="Spring EGOM")
+plot(SSB_Spring_WGOM$YEAR,SSB_Spring_WGOM$SSB, type="l",ylim=c(0,20),xlim=c(1982,2019),ylab="SSB",lwd=3,col="#00608A",main="Spring WGOM")
+plot(SSB_Spring_GBK$YEAR,SSB_Spring_GBK$SSB, type="l",ylim=c(0,85),xlim=c(1982,2019),ylab="SSB",lwd=3,col="#00608A",main="Spring GBK")
+plot(SSB_Spring_SNE$YEAR,SSB_Spring_SNE$SSB, type="l",ylim=c(0,20),xlim=c(1982,2019),ylab="SSB",lwd=3,col="#00608A",main="Spring SNE")
