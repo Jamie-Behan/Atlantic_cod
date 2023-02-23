@@ -87,7 +87,7 @@ lineplot_seasonal(springdata=EGOM_Growth_spring,
                   springX= EGOM_Growth_spring$Year,
                   main="NEFSC Trawl Survey Relative Condition: EGOM",
                   ylab="Relative Condition (K)",
-                  ylim=c(0.9,1.1))
+                  ylim=c(0.9,1.25))
 lineplot_seasonal(springdata=WGOM_Growth_spring,
                   falldata=WGOM_Growth_fall,
                   springY=WGOM_Growth_spring$K_rel,
@@ -96,7 +96,7 @@ lineplot_seasonal(springdata=WGOM_Growth_spring,
                   springX= WGOM_Growth_spring$Year,
                   main="NEFSC Trawl Survey Relative Condition: WGOM",
                   ylab="Relative Condition (K)",
-                  ylim=c(0.9,1.1))
+                  ylim=c(0.9,1.25))
 lineplot_seasonal(springdata=GBK_Growth_spring,
                   falldata=GBK_Growth_fall,
                   springY=GBK_Growth_spring$K_rel,
@@ -105,7 +105,7 @@ lineplot_seasonal(springdata=GBK_Growth_spring,
                   springX= GBK_Growth_spring$Year,
                   main="NEFSC Trawl Survey Relative Condition: GBK",
                   ylab="Relative Condition (K)",
-                  ylim=c(0.9,1.1))
+                  ylim=c(0.9,1.25))
 lineplot_seasonal(springdata=SNE_Growth_spring,
                   falldata=SNE_Growth_fall,
                   springY=SNE_Growth_spring$K_rel,
@@ -114,7 +114,7 @@ lineplot_seasonal(springdata=SNE_Growth_spring,
                   springX= SNE_Growth_spring$Year,
                   main="NEFSC Trawl Survey Relative Condition: SNE",
                   ylab="Relative Condition (K)",
-                  ylim=c(0.9,1.1))
+                  ylim=c(0.9,1.25))
 #### view weight at age anomaly timeseries ####
 
 png(here("Figures/Raw_data_trends/WAAanomaly.png"),height= 800, width = 1700,res=125)
@@ -406,7 +406,7 @@ dev.off()
 png("Figures/GAM_curves/growth/EGOM_fall_krel.png",width = 449, height = 374.5, units = "px")
 par(mar=c(4.5,4.5,0.6,1))
 layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(egomkrel,WGOM_Growth_fall$sst_anomaly,x_lab="BT Anomaly (C)",y_lab="PE on Rel. Condition",select1=1,data_Year = EGOM_Growth_fall$Year,position = "bottomleft",title="WGOM Rel. Condition Fall")
+GAM_CURVE_FUN(egomkrel,EGOM_Growth_fall$sst_anomaly,x_lab="BT Anomaly (C)",y_lab="PE on Rel. Condition",select1=1,data_Year = EGOM_Growth_fall$Year,position = "bottomleft",title="EGOM Rel. Condition Fall")
 dev.off()
 ##### WGOM SPRING####
 #WAA1
@@ -430,6 +430,10 @@ dev.off()
 wgomWAA3<-gam(age3_anomaly ~ s(calfin_100m3, k=8)+s(pseudo_100m3,k=8), family=gaussian(),method = "REML",data=WGOM_Growth_spring)
 summary(wgomWAA3)
 wgomWAA3$aic
+
+plot(influence.gam(wgomWAA3))
+abline(h = 4/nrow(WGOM_Growth_spring), lty = 2, col = "red") # add cutoff line
+
 png("Figures/residual_plots/growth/WGOM_spring_WAA3.png",width = 449, height = 374.5, units = "px",res=90)
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
@@ -551,6 +555,10 @@ dev.off()
 wgomkrel<-gam(K_rel ~ s(sst_anomaly, k=10), family=gaussian(),method = "REML",data=WGOM_Growth_fall)
 summary(wgomkrel)
 wgomkrel$aic
+
+plot(influence.gam(wgomkrel))
+abline(h = 4/nrow(WGOM_Growth_fall), lty = 2, col = "red") # add cutoff line
+
 png("Figures/residual_plots/growth/WGOM_fall_krel.png",width = 449, height = 374.5, units = "px",res=90)
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
@@ -634,7 +642,7 @@ gam.check(gbkkrel,pch=20, cex=1,cex.lab=1.3)
 dev.off()
 png("Figures/GAM_curves/growth/GBK_spring_krel.png",width =449, height = 374.5, units = "px")
 layout(matrix(1:1, ncol=1, byrow=TRUE))
-GAM_CURVE_FUN(gbkkrel,GBK_Growth_spring$pseudo_100m3,x_lab="Pseudocalanus Abundance (/100m3)",y_lab="PE on WAA Anomaly",select1=1,data_Year = GBK_Growth_spring$Year,position = "topleft",title="GBK krel Spring")
+GAM_CURVE_FUN(gbkkrel,GBK_Growth_spring$pseudo_100m3,x_lab="Pseudocalanus Abundance (/100m3)",y_lab="PE on Relative Condition",select1=1,data_Year = GBK_Growth_spring$Year,position = "topleft",title="GBK Rel. Condition Spring")
 dev.off()
 ##### GBK FALL####
 #WAA1
@@ -672,6 +680,10 @@ dev.off()
 gbkWAA4<-gam(age4_anomaly ~ s(calfin_100m3,k=10), family=gaussian(),method = "REML",data=GBK_Growth_fall)
 summary(gbkWAA4)
 gbkWAA4$aic
+
+plot(influence.gam(gbkWAA4))
+abline(h = 4/nrow(GBK_Growth_fall), lty = 2, col = "red") # add cutoff line
+
 png("Figures/residual_plots/growth/GBK_fall_WAA4.png",width = 449, height = 374.5, units = "px",res=90)
 par(mar=c(4,4,1,1))
 layout(matrix(1:4, ncol=2, byrow=FALSE))
