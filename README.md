@@ -7,8 +7,9 @@
   <br>
   
 ### **Included in this Repository is the following:**
+###   **1. "Figures" folder containing .png images of supplemental figures not included in technical report:**
 
-###   **1. "Code" folder containing R code used:**
+###   **2. "Code" folder containing R code used:**
 
 | File | Description |
 | ----------- | ----------- |
@@ -23,5 +24,8 @@
 |**cod_recruitment_NEFSC.R**|.R file used for to achieve recruitment GAM results using NEFSC data|
 |**get_WAA_anomalies.R**|.R file used for to get weight at age (WAA) anomaly data used in growth analyses|
 |**get_depth_lat.R**|.R file used get mean depth and latitude data, disaggregated by adults and juvenile groups<ul><li>Data generated were used in the "DisMAP_vs_adultjuv_raw.R" exploratory analyses</li>|
+
+###   **3. "Final_Data_for_Modelers.zip" zip folder containing data that went into GAM analyses:**
+ * ##### The environmental data can also be used by modelers working within the assessment. However, PLEASE note the **environmental data have ALREADY BEEN LAGGED**
 
 #### Any further questions can be directed to Jamie Behan: jbehan@gmri.org
