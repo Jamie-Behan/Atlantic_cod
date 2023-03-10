@@ -106,36 +106,70 @@ WAA_EGOM_spring<-WAA_EGOM_spring[c(2,4)]
 
 
 rm(WAA_EGOM,WAA_GBK,WAA_WGOM)
-#### EGOM #####
-plot(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="1"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="1"], type="b",
+#####Plow raw WAA, not anomalies###
+par(mar=c(2,4,2,1), mfrow=c(2,3))
+#### EGOM fall #####
+plot(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="1"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="1"], type="l",
      xlim=range(WAA_EGOM$YEAR), ylim=range(c(0:10)), xlab = "Year",ylab = "Mean Weight (Kg)",col="#535353",lwd=2,main="EGOM Fall")
-lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="2"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="2"], type="b",col="#00608A",lwd=2)
-lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="3"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="3"], type="b",col="#407331",lwd=2)
-lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="4"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="4"], type="b",col="#EA4F12",lwd=2)
-lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="5"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="5"], type="b",col="#EACA00",lwd=2)
-lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="6"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="6"], type="b",col="#00736D",lwd=2)
-legend(2011, 10, legend=c("Age 1 (24/38)", "Age 2 (31/38)","Age 3 (24/38)", "Age 4 (13/38)","Age 5 (10/38)", "Age 6 (4/38)"),
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="2"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="2"], type="l",col="#00608A",lwd=2)
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="3"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="3"], type="l",col="#407331",lwd=2)
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="4"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="4"], type="l",col="#EA4F12",lwd=2)
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="5"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="5"], type="l",col="#EACA00",lwd=2)
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="6"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="FALL" & WAA_EGOM$AGE=="6"], type="l",col="#00736D",lwd=2)
+legend("topright", legend=c("Age 1 (24/38)", "Age 2 (31/38)","Age 3 (24/38)", "Age 4 (13/38)","Age 5 (10/38)", "Age 6 (4/38)"),
        col=c("#535353", "#00608A","#407331","#EA4F12","#EACA00","#00736D"), lty=1, cex=1,lwd=3)
 ###### WGOM #####
-plot(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="1"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="1"], type="b",
+plot(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="1"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="1"], type="l",
      xlim=range(WAA_WGOM$YEAR), ylim=range(c(0:11)), xlab = "Year",ylab = "Mean Weight (Kg)",col="#535353",lwd=2,main="WGOM Fall")
-lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="2"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="2"], type="b",col="#00608A",lwd=2)
-lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="3"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="3"], type="b",col="#407331",lwd=2)
-lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="4"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="4"], type="b",col="#EA4F12",lwd=2)
-lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="5"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="5"], type="b",col="#EACA00",lwd=2)
-lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="6"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="6"], type="b",col="#00736D",lwd=2)
-legend(2014, 11.25, legend=c("Age 1 (38/38)", "Age 2 (39/38)","Age 3 (39/38)", "Age 4 (39/38)","Age 5 (37/38)", "Age 6 (30/38)"),
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="2"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="2"], type="l",col="#00608A",lwd=2)
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="3"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="3"], type="l",col="#407331",lwd=2)
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="4"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="4"], type="l",col="#EA4F12",lwd=2)
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="5"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="5"], type="l",col="#EACA00",lwd=2)
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="6"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="FALL" & WAA_WGOM$AGE=="6"], type="l",col="#00736D",lwd=2)
+legend("topright", legend=c("Age 1 (38/38)", "Age 2 (39/38)","Age 3 (39/38)", "Age 4 (39/38)","Age 5 (37/38)", "Age 6 (30/38)"),
        col=c("#535353", "#00608A","#407331","#EA4F12","#EACA00","#00736D"), lty=1, cex=1,lwd=3)
 
 ###### GBK #####
-plot(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="1"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="1"], type="b",
+plot(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="1"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="1"], type="l",
      xlim=range(WAA_GBK$YEAR), ylim=range(c(0:11)), xlab = "Year",ylab = "Mean Weight (Kg)",col="#535353",lwd=2,main="GBK Fall")
-lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="2"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="2"], type="b",col="#00608A",lwd=2)
-lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="3"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="3"], type="b",col="#407331",lwd=2)
-lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="4"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="4"], type="b",col="#EA4F12",lwd=2)
-lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="5"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="5"], type="b",col="#EACA00",lwd=2)
-lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="6"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="6"], type="b",col="#00736D",lwd=2)
-legend(2014, 11.25, legend=c("Age 1 (38/38)", "Age 2 (39/38)","Age 3 (39/38)", "Age 4 (37/38)","Age 5 (33/38)", "Age 6 (23/38)"),
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="2"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="2"], type="l",col="#00608A",lwd=2)
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="3"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="3"], type="l",col="#407331",lwd=2)
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="4"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="4"], type="l",col="#EA4F12",lwd=2)
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="5"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="5"], type="l",col="#EACA00",lwd=2)
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="6"], WAA_GBK$MEAN[WAA_GBK$SEASON=="FALL" & WAA_GBK$AGE=="6"], type="l",col="#00736D",lwd=2)
+legend("topright", legend=c("Age 1 (38/38)", "Age 2 (39/38)","Age 3 (39/38)", "Age 4 (37/38)","Age 5 (33/38)", "Age 6 (23/38)"),
+       col=c("#535353", "#00608A","#407331","#EA4F12","#EACA00","#00736D"), lty=1, cex=1,lwd=3)
+
+#### EGOM spring #####
+plot(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="1"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="1"], type="l",
+     xlim=range(WAA_EGOM$YEAR), ylim=range(c(0:10)), xlab = "Year",ylab = "Mean Weight (Kg)",col="#535353",lwd=2,main="EGOM Spring")
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="2"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="2"], type="l",col="#00608A",lwd=2)
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="3"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="3"], type="l",col="#407331",lwd=2)
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="4"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="4"], type="l",col="#EA4F12",lwd=2)
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="5"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="5"], type="l",col="#EACA00",lwd=2)
+lines(WAA_EGOM$YEAR[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="6"], WAA_EGOM$MEAN[WAA_EGOM$SEASON=="SPRING" & WAA_EGOM$AGE=="6"], type="l",col="#00736D",lwd=2)
+legend("topright", legend=c("Age 1 (31/38)", "Age 2 (26/38)","Age 3 (21/38)", "Age 4 (20/38)","Age 5 (8/38)", "Age 6 (5/38)"),
+       col=c("#535353", "#00608A","#407331","#EA4F12","#EACA00","#00736D"), lty=1, cex=1,lwd=3)
+###### WGOM #####
+plot(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="1"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="1"], type="l",
+     xlim=range(WAA_WGOM$YEAR), ylim=range(c(0:11)), xlab = "Year",ylab = "Mean Weight (Kg)",col="#535353",lwd=2,main="WGOM Spring")
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="2"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="2"], type="l",col="#00608A",lwd=2)
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="3"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="3"], type="l",col="#407331",lwd=2)
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="4"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="4"], type="l",col="#EA4F12",lwd=2)
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="5"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="5"], type="l",col="#EACA00",lwd=2)
+lines(WAA_WGOM$YEAR[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="6"], WAA_WGOM$MEAN[WAA_WGOM$SEASON=="SPRING" & WAA_WGOM$AGE=="6"], type="l",col="#00736D",lwd=2)
+legend("topright", legend=c("Age 1 (37/38)", "Age 2 (38/38)","Age 3 (38/38)", "Age 4 (38/38)","Age 5 (38/38)", "Age 6 (38/38)"),
+       col=c("#535353", "#00608A","#407331","#EA4F12","#EACA00","#00736D"), lty=1, cex=1,lwd=3)
+
+###### GBK #####
+plot(WAA_GBK$YEAR[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="1"], WAA_GBK$MEAN[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="1"], type="l",
+     xlim=range(WAA_GBK$YEAR), ylim=range(c(0:11)), xlab = "Year",ylab = "Mean Weight (Kg)",col="#535353",lwd=2,main="GBK Spring")
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="2"], WAA_GBK$MEAN[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="2"], type="l",col="#00608A",lwd=2)
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="3"], WAA_GBK$MEAN[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="3"], type="l",col="#407331",lwd=2)
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="4"], WAA_GBK$MEAN[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="4"], type="l",col="#EA4F12",lwd=2)
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="5"], WAA_GBK$MEAN[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="5"], type="l",col="#EACA00",lwd=2)
+lines(WAA_GBK$YEAR[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="6"], WAA_GBK$MEAN[WAA_GBK$SEASON=="SPRING" & WAA_GBK$AGE=="6"], type="l",col="#00736D",lwd=2)
+legend("topright", legend=c("Age 1 (32/38)", "Age 2 (38/38)","Age 3 (38/38)", "Age 4 (38/38)","Age 5 (38/38)", "Age 6 (37/38)"),
        col=c("#535353", "#00608A","#407331","#EA4F12","#EACA00","#00736D"), lty=1, cex=1,lwd=3)
 
 #### find length function#####
@@ -244,8 +278,6 @@ WAA_GBK_spring<-WAA_GBK_spring[c(1,9:15)]
 #write.csv(WAA_WGOM_spring,here("data/WAA/anomaly_data/WAA_WGOM_spring.csv"), row.names = FALSE)
 #write.csv(WAA_GBK_fall,here("data/WAA/anomaly_data/WAA_GBK_fall.csv"), row.names = FALSE)
 #write.csv(WAA_GBK_spring,here("data/WAA/anomaly_data/WAA_GBK_spring.csv"), row.names = FALSE)
-
-
 
 
 
