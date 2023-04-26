@@ -242,7 +242,7 @@ trackyear<-data.frame(matrix(ncol = 1, nrow = 0))
 colnames(trackyear) <- c('cpyear')
 changepoint_fun<- function(data,dfnames,foldertype,yax,ylabel,datatype){
   for (k in 2:length(data)){
-    fit_cpt = changepoint::cpt.mean(na.omit(data[c(1:38),k]))  # Fit mean model
+    fit_cpt = changepoint::cpt.mean(na.omit(data[c(1:38),k]),method = "PELT",penalty="AIC",minseglen = 5)  # Fit mean model
     ints = param.est(fit_cpt)$mean #get mean cpt values
     cp = cpts(fit_cpt) #get changepoint year numbers
     cpyear<-na.omit(as.data.frame(data[c(1,k)]))[cp,1] #get changepoint year
@@ -255,10 +255,25 @@ changepoint_fun<- function(data,dfnames,foldertype,yax,ylabel,datatype){
     png(here(paste0("Figures/Raw_data_trends/Changepoint/",foldertype,"/changepoint/",dfnames[k-1],".png")),width = 449, height = 374.5, units = "px",res=90)
     par(mar=c(4,4.5,2,0.5))
     plot(data[,1],data[,k],main=paste0(c(dfnames[k-1],yax),collapse=" "),ylab=ylabel, xlab="Year",type="l",lwd=3,col="#00608A",cex.lab=1.5,cex.axis=1.2,xaxt='n')
+    
+    abline(v=c(cpyear[1],cpyear[2],cpyear[3]),col="red",lwd=3,lty=2)
+    if (length(cp)==0){abline(h=ints[1],col="red",lwd=1,lty=1)}else{
+      if (length(cp)==1){ablineclip(h=ints[1],col="red",lwd=1,lty=1,x1=startyear-1,x2=cpyear[1])
+        ablineclip(h=ints[2],col="red",lwd=1,lty=1,x1=cpyear[1],x2=finalyear)}else{
+          if (length(cp)==2){ablineclip(h=ints[1],col="red",lwd=1,lty=1,x1=startyear-1,x2=cpyear[1])
+            ablineclip(h=ints[2],col="red",lwd=1,lty=1,x1=cpyear[1],x2=cpyear[2])
+            ablineclip(h=ints[3],col="red",lwd=1,lty=1,x1=cpyear[2],x2=finalyear)}else{
+              if (length(cp)>=3){ablineclip(h=ints[1],col="red",lwd=1,lty=1,x1=startyear-1,x2=cpyear[1])
+                ablineclip(h=ints[2],col="red",lwd=1,lty=1,x1=cpyear[1],x2=cpyear[2])
+                ablineclip(h=ints[3],col="red",lwd=1,lty=1,x1=cpyear[2],x2=cpyear[3])
+                ablineclip(h=ints[4],col="red",lwd=1,lty=1,x1=cpyear[3],x2=finalyear)}
+              
+            }}}
+    
     axis(side=1,at=c(startyear,cpyear,finalyear),labels=c(startyear,cpyear,finalyear))
-    abline(v=cpyear,col="red",lwd=3,lty=2)
-    ablineclip(h=ints[1],col="red",lwd=1,lty=1,x1=startyear-1,x2=if(length(cp)==0){finalyear}else{cpyear})
-    ablineclip(h=ints[2],col="red",lwd=1,lty=1,x1=if(length(cp)==0){startyear-1}else{cpyear},x2=finalyear)
+#    abline(v=cpyear,col="red",lwd=3,lty=2)
+#    ablineclip(h=ints[1],col="red",lwd=1,lty=1,x1=startyear-1,x2=if(length(cp)==0){finalyear}else{cpyear})
+#    ablineclip(h=ints[2],col="red",lwd=1,lty=1,x1=if(length(cp)==0){startyear-1}else{cpyear},x2=finalyear)
     legend("topright",inset=c(0.03,0.03), legend=c(datatype, "Segmented Mean","Changepoint"), col=c("#00608A", "red", "red"), lty=c(1,1,2),lwd=c(3,1,3), cex=1.0)
     dev.off()
   }
@@ -349,9 +364,9 @@ dev.off()
 png(here("Figures/Raw_data_trends/Changepoint/recruitment/changepoint/Recruitment_density.png"),width =449,height=374.5, units = "px",res=100)
 d <- density(RSSB_cpyears$cpyear,bw=2.8)
 plot(d, main="Recruitment CP Year Trends: Changepoint", xlab="Year",lwd=3,col="#00736D",xlim=c(1977,2023),ylim=c(0,0.18))
-#lines(density(R_cpyears$cpyear,bw=2.8),lwd=3,col="#ABB400",xlim=c(1977,2023),ylim=c(0,0.1))
-#legend("topleft", c(paste0("Numbers at Age 1 Data   N=",nrow(R_cpyears)),paste0("R/SSB Data   N=",nrow(RSSB_cpyears))), col=c("#ABB400","#00736D"),lty = c(1,1),lwd = c(3,3),cex = 0.8)
-legend("topleft", c(paste0("R/SSB Data   N=",nrow(RSSB_cpyears))), col=c("#00736D"),lty = c(1,1),lwd = c(3,3),cex = 0.8)
+lines(density(R_cpyears$cpyear,bw=2.8),lwd=3,col="#ABB400",xlim=c(1977,2023),ylim=c(0,0.1))
+legend("topleft", c(paste0("Numbers at Age 1 Data   N=",nrow(R_cpyears)),paste0("R/SSB Data   N=",nrow(RSSB_cpyears))), col=c("#ABB400","#00736D"),lty = c(1,1),lwd = c(3,3),cex = 0.8)
+#legend("topleft", c(paste0("R/SSB Data   N=",nrow(RSSB_cpyears))), col=c("#00736D"),lty = c(1,1),lwd = c(3,3),cex = 0.8)
 
 dev.off()
 ###################change point analysis for CONDITION data for cod####
@@ -567,17 +582,18 @@ WAAdf_2<-clusterprep(WAAdf_2)
 chclustfun<-function (data, Stockarea){
   
   dat <- t(data[-1])
-  dat_dist <- dist(dat, method="euclidean")  
-  datfit <- chclust(dat_dist) 
+  dat_dist <- dist(dat,method="euclidean")  
+  datfit <- chclust(dat_dist,method="coniss") 
+  
   # Plot the cluster analysis
   par(mar=c(2.75,0.2,2.5,0.2),cex=1)
-  plot(datfit,hang=-1,main = Stockarea, lwd = 2,cex.main=1.5,axes=FALSE,cex=0.8)
+  plot(datfit,hang=-1,main = Stockarea, lwd = 2,cex.main=1.1,axes=FALSE,cex=0.7)
   par(lwd=3, mar=c(0,0,0,0))
   rect.hclust(datfit,k=3,border="cadetblue")
 }
 
 ### PLOT ALL age1 recruitment ####
-png(here("Figures/Raw_data_trends/Changepoint/cluster/All_age1.png"),width =898,height=1123.5, units = "px",res=100)
+png(here("Figures/Raw_data_trends/Changepoint/cluster/All_age1.png"),width =898,height=800, units = "px",res=100)
 par(mfrow = c(3, 2))
 chclustfun(data=age1df_WGOMF, "WGOM Fall Recruitment")
 chclustfun(data=age1df_WGOMS, "WGOM Spring Recruitment")
@@ -587,7 +603,7 @@ chclustfun(data=age1df_GBKF, "GBK Fall Recruitment")
 chclustfun(data=age1df_GBKS, "GBK Spring Recruitment")
 dev.off()
 ### PLOT ALL rssb recruitment ####
-png(here("Figures/Raw_data_trends/Changepoint/cluster/All_rssb.png"),width =898,height=1123.5, units = "px",res=120)
+png(here("Figures/Raw_data_trends/Changepoint/cluster/All_rssb.png"),width =898,height=800, units = "px",res=120)
 par(mfrow = c(3, 2))
 chclustfun(data=rssbdf_WGOMF, "WGOM Fall R/SSB")
 chclustfun(data=rssbdf_WGOMS, "WGOM Spring R/SSB")
@@ -597,7 +613,7 @@ chclustfun(data=rssbdf_GBKF, "GBK Fall R/SSB")
 chclustfun(data=rssbdf_GBKS, "GBK Spring R/SSB")
 dev.off()
 ### PLOT ALL relk ####
-png(here("Figures/Raw_data_trends/Changepoint/cluster/All_relk.png"),width =898,height=1123.5, units = "px",res=120)
+png(here("Figures/Raw_data_trends/Changepoint/cluster/All_relk.png"),width =898,height=800, units = "px",res=120)
 par(mfrow = c(3, 2))
 chclustfun(data=relkdf_WGOMF, "WGOM Fall Rel. Condition")
 chclustfun(data=relkdf_WGOMS, "WGOM Spring Rel. Condition")
