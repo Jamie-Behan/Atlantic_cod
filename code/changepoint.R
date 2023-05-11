@@ -472,7 +472,9 @@ png(here("Figures/Raw_data_trends/Changepoint/growth/changepoint/growth_density.
 d <- density(WAA_cpyears$cpyear,bw=2.8)
 plot(d, main="Growth CP Year Trends: Changepoint", xlab="Year",lwd=3,col="#ABB400",xlim=c(1977,2023),ylim=c(0,0.1))
 #lines(density(WAA_cpyears$cpyear,bw=2.8),lwd=3,col="#ABB400",xlim=c(1977,2023),ylim=c(0,0.1))
-legend("topleft", c(paste0("Weight at Age Data   N=",nrow(WAA_cpyears))), col=c("#ABB400"),lty = c(1,1),lwd = c(3,3),cex = 0.8)
+lines(density(c(2003,2007,2001,2011,2009,2013,1999,2012,2003,2011),bw=2.8),lwd=3,col="#003f5b",xlim=c(1977,2023),ylim=c(0,0.1)) #add line for condition cluster results
+lines(density(c(1991,1995,1990,2001,1990,1993,1998,2011,1991),bw=2.8),lwd=3,col="#717700",xlim=c(1977,2023),ylim=c(0,0.1)) #add line for WAA cluster results
+legend("topleft", c(paste0("Weight at Age Data   N=",nrow(WAA_cpyears)),"Cluster Analysis: Condition Data","Cluster Analysis: WAA Data"), col=c("#ABB400","#003f5b","#717700"),lty = c(1,1,1),lwd = c(3,3,3),cex = 0.8)
 dev.off()
 ################################################### Chronological Clustering Code ####
 library(tidyverse)
@@ -577,7 +579,7 @@ rssbdf_2<-clusterprep(rssbdf_2)
 relkdf_2<-clusterprep(relkdf_2)
 WAAdf_2<-clusterprep(WAAdf_2)
 
-#### Run the hierarchical cluster analysis####
+#### Run the chronological cluster analysis####
 #chclust function####
 chclustfun<-function (data, Stockarea){
   
@@ -647,4 +649,41 @@ chclustfun(age1df_2, "All Stock Areas: Recruitment")
 chclustfun(rssbdf_2, "All Stock Areas: R/SSB")
 chclustfun(relkdf_2, "All Stock Areas: Rel. Condition")
 chclustfun(WAAdf_2, "All Stock Areas: WAA")
+dev.off()
+### Make comparison density plots####
+### Recruitment ####
+# Density Plot
+png(here("Figures/Raw_data_trends/Changepoint/recruitment/recruitment_density.png"),width =449,height=374.5, units = "px",res=100)
+d <- density(R_Envyears$cpyear,bw=2.8)
+plot(d, main="Changepoint Year Trends: Recruitment", xlab="Year",lwd=3,col="#ABB400",xlim=c(1977,2023),ylim=c(0,0.13))
+lines(density(R_cpyears$cpyear,bw=2.8),lwd=3,col="#003f5b",xlim=c(1977,2023),ylim=c(0,0.13))# no numbers
+lines(density(c(1988,2010,1988,2000,1986,1991),bw=2.8),lwd=3,col="#717700",xlim=c(1977,2023),ylim=c(0,0.13)) #add line for condition cluster results
+legend("topleft", c(paste0("EnvCpt Package  N=",nrow(R_Envyears)),paste0("Changepoint Package  N=",nrow(R_cpyears)),"Cluster Analysis  N=6"), col=c("#ABB400","#003f5b","#717700"),lty = c(1,1,1),lwd = c(3,3,3),cex = 0.8)
+dev.off()
+### R/SSB ####
+# Density Plot
+png(here("Figures/Raw_data_trends/Changepoint/recruitment/rssb_density.png"),width =449,height=374.5, units = "px",res=100)
+d <- density(RSSB_Envyears$cpyear,bw=2.8)
+plot(d, main="Changepoint Year Trends: R/SSB", xlab="Year",lwd=3,col="#ABB400",xlim=c(1977,2023),ylim=c(0,0.13))
+lines(density(RSSB_cpyears$cpyear,bw=2.8),lwd=3,col="#003f5b",xlim=c(1977,2023),ylim=c(0,0.13))# no numbers
+lines(density(c(1988,2006,1999,2000,1991),bw=2.8),lwd=3,col="#717700",xlim=c(1977,2023),ylim=c(0,0.13)) #add line for condition cluster results
+legend("topleft", c(paste0("EnvCpt Package  N=",nrow(RSSB_Envyears)),paste0("Changepoint Package  N=",nrow(RSSB_cpyears)),"Cluster Analysis  N=5"), col=c("#ABB400","#003f5b","#717700"),lty = c(1,1,1),lwd = c(3,3,3),cex = 0.8)
+dev.off()
+### Condition ####
+# Density Plot
+png(here("Figures/Raw_data_trends/Changepoint/growth/condition_density.png"),width =449,height=374.5, units = "px",res=100)
+d <- density(Relk_Envyears$cpyear,bw=2.8)
+plot(d, main="Changepoint Year Trends: Condition", xlab="Year",lwd=3,col="#ABB400",xlim=c(1977,2023),ylim=c(0,0.13))
+#lines(density(Relk_cpyears$cpyear,bw=2.8),lwd=3,col="#003f5b",xlim=c(1977,2023),ylim=c(0,0.13))# no numbers
+lines(density(c(2003,2007,2001,2011,2009,2013,1999,2012,2003,2011),bw=2.8),lwd=3,col="#717700",xlim=c(1977,2023),ylim=c(0,0.13)) #add line for condition cluster results
+legend("topleft", c(paste0("EnvCpt Package  N=",nrow(Relk_Envyears)),paste0("Changepoint Package  N=",nrow(Relk_cpyears)),"Cluster Analysis  N=10"), col=c("#ABB400","#003f5b","#717700"),lty = c(1,1,1),lwd = c(3,3,3),cex = 0.8)
+dev.off()
+### WAA ####
+# Density Plot
+png(here("Figures/Raw_data_trends/Changepoint/growth/WAA_density.png"),width =449,height=374.5, units = "px",res=100)
+d <- density(WAA_Envyears$cpyear,bw=2.8)
+plot(d, main="Changepoint Year Trends: Weight at Age", xlab="Year",lwd=3,col="#ABB400",xlim=c(1977,2023),ylim=c(0,0.13))
+lines(density(WAA_cpyears$cpyear,bw=2.8),lwd=3,col="#003f5b",xlim=c(1977,2023),ylim=c(0,0.13))# no numbers
+lines(density(c(1991,1995,1990,2001,1990,1993,1998,2011,1991),bw=2.8),lwd=3,col="#717700",xlim=c(1977,2023),ylim=c(0,0.13)) #add line for condition cluster results
+legend("topleft", c(paste0("EnvCpt Package  N=",nrow(WAA_Envyears)),paste0("Changepoint Package  N=",nrow(WAA_cpyears)),"Cluster Analysis  N=9 (ages combined)"), col=c("#ABB400","#003f5b","#717700"),lty = c(1,1,1),lwd = c(3,3,3),cex = 0.8)
 dev.off()
