@@ -69,6 +69,7 @@ colnames(age1df)<-c('Year',
 age1names<-colnames(age1df[2:7])
 envcpt_fun(age1df[-c(8:9)],age1names,foldertype="recruitment",yax="Abundance",ylabel="Recruitment",datatype="Recruitment Data")
 R_Envyears<-as.data.frame(cpyear)
+
 ### PLOT ALL Age 1 ####
 png(here("Figures/Raw_data_trends/Changepoint/recruitment/EnvCPT/All_age1.png"),width =898,height=1123.5, units = "px",res=100)
 img1 <-  rasterGrob(as.raster(readPNG("Figures/Raw_data_trends/Changepoint/recruitment/EnvCPT/WGOM_Fall_age1.png")), interpolate = FALSE)
@@ -133,7 +134,7 @@ colnames(relkdf)<-c('Year',
                  'GBK_Fall_K','GBK_Spring_K',
                  'SNE_Fall_K','SNE_Spring_K')
 #### call function for condition index data####
-relknames<-colnames(relkdf[2:7])
+relknames<-colnames(relkdf[2:9])
 envcpt_fun(relkdf[-c(8:9)],relknames,foldertype="growth",yax="",ylabel="Cod Rel. K",datatype="Growth Data")
 Relk_Envyears<-as.data.frame(cpyear)
 ### PLOT ALL relk ####
@@ -167,7 +168,7 @@ colnames(WAAdf)<-c('Year',
                     'GBK_Fall_WAA1','GBK_Fall_WAA2','GBK_Fall_WAA3','GBK_Fall_WAA4','GBK_Fall_WAA5',
                     'GBK_Spring_WAA1','GBK_Spring_WAA2','GBK_Spring_WAA3','GBK_Spring_WAA4','GBK_Spring_WAA5','GBK_Spring_WAA6','GBK_Spring_WAA7')
 #### call function for WAA data####
-WAAnames<-colnames(WAAdf[2:27])
+WAAnames<-colnames(WAAdf[2:28])
 envcpt_fun(WAAdf,WAAnames,foldertype="growth",yax="",ylabel="Cod WAA",datatype="Growth Data")
 WAA_Envyears<-as.data.frame(cpyear)
 ##### Density Plot#####
