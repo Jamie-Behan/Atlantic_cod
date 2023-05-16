@@ -21,6 +21,7 @@
 |**Env_data_by_stock.R**| .R file used to pull relevant environmental data from [ecodata package](https://github.com/NOAA-EDAB/ecodata) in R, and wrangle data into consistent format to be read in other .r files. Originally used but later replaced by "Environmental_data2.R" file|
 |**Environmental_data2.R**| New environmental data with updated lags and bottom temperature data. This was used to wrangle final environmental datasets used in models|
 |**Envdata2_MADMF.R**| Environmental data wrangling used in MADMF models in the "WGOM_R_MADMF.R" script |
+|**GAM_forloop.R**|.R file containing functions used to to fun multiple GAM ieterations in effort to streamline best model selection.|
 |**Gam_data_exploration.R**|.R file containing functions used to check data assumptions and explore data distributions|
 |**get_WAA_anomalies.R**|.R file used for to get weight at age (WAA) anomaly data used in growth analyses|
 |**get_depth_lat.R**|.R file used get mean depth and latitude data, disaggregated by adults and juvenile groups<ul><li>Data generated were used in the "DisMAP_vs_adultjuv_raw.R" exploratory analyses</li>|
