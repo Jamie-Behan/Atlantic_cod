@@ -178,6 +178,8 @@ legend("topright",inset=c(0.02,0.02), legend=c("Age 1", "Age 2","Age 3", "Age 4"
 dev.off()
 
 ################ GAM LOOP FUNCTION#####
+source(here("Code/GAM_forloop.R"))
+#### keep GAMloop function because this one automatically includes sstxbt anomaly as a pairwise correlation
 GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,number_vars_in_mod){
   
   #create all combinations of predictors
@@ -286,104 +288,49 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
 ####EGOM SPRING#####
 targets <- c("age1_anomaly","K_rel")
 predictors <- colnames(EGOM_Growth_spring)[!(colnames(EGOM_Growth_spring) %in% c("Year","K_rel","age1_anomaly"))]
-#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
 GAM_LOOP_FUN(Edata=EGOM_Growth_spring,k="k=4",correlated_vars1="NA",correlated_vars2="NA",correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
-hypergrid_gaus<-hypergrid
-hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-
-png("Figures/Model_run_tables/growth/EGOM_spring_growth.png",height= 23*nrow(hypergrid_gaus), width = 138*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
-
+allorsome(all=FALSE)
 ####EGOM FALL#####
 targets <- c("age2_anomaly","K_rel")
 predictors <- colnames(EGOM_Growth_fall)[!(colnames(EGOM_Growth_fall) %in% c("Year","K_rel","age2_anomaly","SSB"))]
 correlated_vars<-c("sst_anomaly","Heatwave")
 
 GAM_LOOP_FUN(Edata=EGOM_Growth_fall,k="k=8",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
-hypergrid_gaus<-hypergrid
-hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-
-png("Figures/Model_run_tables/growth/EGOM_fall_growth.png",height= 24*nrow(hypergrid_gaus), width = 120*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
+allorsome(all=FALSE)
 ######WGOM SPRING#####
 targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly","K_rel")
 predictors <- colnames(WGOM_Growth_spring)[!(colnames(WGOM_Growth_spring) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly"))]
-#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
 GAM_LOOP_FUN(Edata=WGOM_Growth_spring,k="k=7",correlated_vars1="NA",correlated_vars2="NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
-hypergrid_gaus<-hypergrid
-hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-
-png("Figures/Model_run_tables/growth/WGOM_spring_growth.png",height= 23*nrow(hypergrid_gaus), width = 160*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
+allorsome(all=FALSE)
 ####WGOM FALL#####
 targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","K_rel")
 predictors <- colnames(WGOM_Growth_fall)[!(colnames(WGOM_Growth_fall) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","Heatwave")
 
 GAM_LOOP_FUN(Edata=WGOM_Growth_fall,k="k=7",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[3],correlated_vars3="NA",correlated_vars4="NA",correlated_vars5=correlated_vars[2],correlated_vars6=correlated_vars[3],folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
-hypergrid_gaus<-hypergrid
-hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-
-png("Figures/Model_run_tables/growth/WGOM_fall_growth.png",height= 22*nrow(hypergrid_gaus), width =150*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
+allorsome(all=FALSE)
 ######GBK SPRING#####
 targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly","K_rel")
 predictors <- colnames(GBK_Growth_spring)[!(colnames(GBK_Growth_spring) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","age6_anomaly","age7_anomaly"))]
 correlated_vars<-c("bt_anomaly","GSI")
 
 GAM_LOOP_FUN(Edata=GBK_Growth_spring,k="k=8",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[2],correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
-hypergrid_gaus<-hypergrid
-hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-
-png("Figures/Model_run_tables/growth/GBK_spring_growth.png",height= 22*nrow(hypergrid_gaus), width = 150*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
-
+allorsome(all=FALSE)
 ####GBK FALL#####
 targets <- c("age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly","K_rel")
 predictors <- colnames(GBK_Growth_fall)[!(colnames(GBK_Growth_fall) %in% c("Year","K_rel","age1_anomaly","age2_anomaly","age3_anomaly","age4_anomaly","age5_anomaly"))]
 correlated_vars<-c("bt_anomaly","sst_anomaly","GSI","Heatwave")
 
 GAM_LOOP_FUN(Edata=GBK_Growth_fall,k="k=8",correlated_vars1= correlated_vars[1],correlated_vars2= correlated_vars[4],correlated_vars3= correlated_vars[2],correlated_vars4= correlated_vars[4],correlated_vars5= correlated_vars[1],correlated_vars6= correlated_vars[3],folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
-hypergrid_gaus<-hypergrid
-hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[,!names(hypergrid_gaus)%in%c("model")]
-
-png("Figures/Model_run_tables/growth/GBK_fall_growth.png",height= 22*nrow(hypergrid_gaus), width =150*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
-
+allorsome(all=FALSE)
 ######SNE SPRING#####
 targets <- c("K_rel")
 predictors <- colnames(SNE_Growth_spring)[!(colnames(SNE_Growth_spring) %in% c("Year","K_rel"))]
-#correlated_vars<-c("bt_anomaly","sst_anomaly")
 
 GAM_LOOP_FUN(Edata=SNE_Growth_spring,k="k=4",correlated_vars1="NA",correlated_vars2="NA",correlated_vars3= "NA",correlated_vars4="NA",correlated_vars5="NA",correlated_vars6="NA",folder_name="recruitment",familyXYZ= "family=gaussian()",number_vars_in_mod= (length(predictors)-4))
-hypergrid_gaus<-hypergrid
-hypergrid_gaus$s.pv<-as.character(hypergrid_gaus$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid_gaus,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-
-png("Figures/Model_run_tables/growth/SNE_spring_growth.png",height= 22*nrow(hypergrid_gaus), width = 150*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
+allorsome(all=FALSE)
 ######SNE FALL#####
 #not enough data
 ############### PLOT SIGNIFICANT GAM CURVES #######################

@@ -51,6 +51,8 @@ Mypairs(distribution_spring[4:10])
 
 #############################################
 ################ GAM loop#####
+source(here("Code/GAM_forloop.R"))
+#keeping GAM_LOOP_FUN because this one includes sstxbt anomaly as automatic correlated because distribution analysis revealed more correlated vars
 GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,number_vars_in_mod){
   
   #create all combinations of predictors
@@ -161,13 +163,7 @@ predictors <- colnames(distribution_fall)[!(colnames(distribution_fall) %in% c("
 correlated_vars<-c("bt_anomaly","sst_anomaly","Heatwave","GSI")
 
 GAM_LOOP_FUN(Edata=distribution_fall,k="k=10",correlated_vars1=correlated_vars[1],correlated_vars2=correlated_vars[3],correlated_vars3=correlated_vars[2],correlated_vars4=correlated_vars[3],correlated_vars5=correlated_vars[1],correlated_vars6=correlated_vars[4],folder_name="cod_fall_depth",familyXYZ= "family=gaussian()",number_vars_in_mod = (length(predictors)-4))
-hypergrid$s.pv<-as.character(hypergrid$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-
-png("Figures/Model_run_tables/distribution/fall_depth_lat.png",height= 22*nrow(hypergrid_gaus), width = 170*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
+allorsome(all=TRUE)
 
 #### Testing Spring depth & lat models########
 ############Gaussian###################
@@ -176,13 +172,7 @@ predictors <- colnames(distribution_spring)[!(colnames(distribution_spring) %in%
 correlated_vars<-c("bt_anomaly","sst_anomaly","SSB","calfin_100m3","pseudo_100m3","GSI")
 
 GAM_LOOP_FUN(Edata=distribution_spring,k="k=10",correlated_vars1=correlated_vars[2],correlated_vars2=correlated_vars[3],correlated_vars3=correlated_vars[4],correlated_vars4=correlated_vars[5],correlated_vars5=correlated_vars[1],correlated_vars6=correlated_vars[6],folder_name="cod_spring_lat",familyXYZ= "family=gaussian()",number_vars_in_mod = (length(predictors)-4))
-hypergrid$s.pv<-as.character(hypergrid$s.pv)
-hypergrid_gaus<-as.data.frame(hypergrid,stringsAsFactors = F)
-hypergrid_gaus<-hypergrid_gaus[ , !names(hypergrid_gaus) %in% c("model")]
-
-png("Figures/Model_run_tables/distribution/spring_depth_lat.png",height= 22*nrow(hypergrid_gaus), width = 190*ncol(hypergrid_gaus))
-grid.table(hypergrid_gaus)
-dev.off()
+allorsome(all=TRUE)
 
 ############# PLOT SIGNIFICANT GAM CURVES #######################
 ##### DEPTH (Fall) vs. potential environmental influences###########
