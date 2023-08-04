@@ -2,6 +2,20 @@
 library(pacman)
 pacman::p_load(here, readxl,lubridate,stats,graphics,Hmisc,data.table,utils,mgcv,dplyr,purrr,ecodata,kableExtra,gridExtra,DataExplorer) 
 
+
+####Notes (READ ME:)####
+## Description of parameters
+#' @param  Edata The Data going into the model; data frame containing both the independent and dependent data, each variable in a separate column by year as rows
+#' @param  k    number of knots (k) in GAM. e.g parameter defined as k="k=10" with quotes
+#' @param  correlated_vars (1-6) After running correlation/VIF tests, this parameter is used to identify which variables should not be run in any model iteration together. 
+#' e.g correlated_vars1=correlated_vars[1],correlated_vars2=correlated_vars[4] would signify that the first and 4th independent variables listed in correlated_vars 
+#' list would not both be included together as covariates in any model iteration. Currently there are place holders for up to 3 pairs of correlated variables to exclude (1-2, 3-4, 5-6),
+#' more can be added into source code, but if less are needed, then correlated_vars#="NA" can be used in place.
+#' @param  folder_name Name of folder to put model results (.RDS and .CSV) files in. Name must be written in quotes "
+#' @param  familyXYZ Name of GAM family to put model results (.RDS and .CSV) files in must include family= in quotes. e.g: familyXYZ= "family=gaussian()"
+#' @param  number_vars_in_mod Maximum number of covariates to include in any model run.e.g. if you have 6 environmental covariates to test, but only want a maximum of 4 included in model, can use: number_vars_in_mod = (length(predictors)-2))
+
+####Function:####
 GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,number_vars_in_mod){
   
   #create all combinations of predictors
@@ -33,20 +47,15 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
   
   ### remove list elements that contain duplicate/correlated independent variables
   ## see correlated_vars character list
-  #  predictor_combinations <-predictor_combinations[!grepl("bt_anomaly", predictor_combinations$predictor_combinations)| !grepl("sst_anomaly" ,predictor_combinations$predictor_combinations),]
-  
-  if(correlated_vars1!="NA"||correlated_vars2!="NA"){
-    #
+   if(correlated_vars1!="NA"||correlated_vars2!="NA"){
     predictor_combinations <- as.data.frame(predictor_combinations)
     predictor_combinations <-predictor_combinations[!grepl(correlated_vars1, predictor_combinations$predictor_combinations)| !grepl(correlated_vars2,predictor_combinations$predictor_combinations),]
   } 
   if(correlated_vars3!="NA"||correlated_vars4!="NA"){
-    #
     predictor_combinations <- as.data.frame(predictor_combinations)
     predictor_combinations <-predictor_combinations[!grepl(correlated_vars3, predictor_combinations$predictor_combinations)| !grepl(correlated_vars4,predictor_combinations$predictor_combinations),]
   }
   if(correlated_vars5!="NA"||correlated_vars6!="NA"){
-    #
     predictor_combinations <- as.data.frame(predictor_combinations)
     predictor_combinations <-predictor_combinations[!grepl(correlated_vars5, predictor_combinations$predictor_combinations)| !grepl(correlated_vars6,predictor_combinations$predictor_combinations),]  
   }
@@ -95,10 +104,10 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
     rel.model <- readRDS(paste0("data/trial_results/",folder_name,"/models/", hypergrid[i,]$model, ".RDS"))
     
     #extract model performance, add to hypergrid
-    hypergrid[i, AIC := round(rel.model$aic,digits=3)]
-    hypergrid[i, s.pv := list(round(summary(rel.model)[["s.pv"]],digits=3))]
-    hypergrid[i, dev.expl := round(summary(rel.model)[["dev.expl"]],digits=3)]
-    hypergrid[i, family := rel.model$family[1]]
+    hypergrid[i, AIC := round(rel.model$aic,digits=3)] #AIC
+    hypergrid[i, s.pv := list(round(summary(rel.model)[["s.pv"]],digits=3))] #p-value of each coviariate in model
+    hypergrid[i, dev.expl := round(summary(rel.model)[["dev.expl"]],digits=3)] #deviance explained of model
+    hypergrid[i, family := rel.model$family[1]] #what family was used
   }
   
   #arrange hypergrid and see resulting df showing model diognisc comparisons
@@ -108,10 +117,10 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
 
 allorsome<-function(all){
 ##New stuff added to filter hypergrid results based on significant independent variables
-checksome <- function(x){
+checksome <- function(x){ 
   TRUE %in% (x<=0.05)
 }
-checkall <- function(x){
+checkall <- function(x){ 
   all(x<=0.05)
 }
 # Get a vector that tells you if at least one pvalue <= 0.05
@@ -120,13 +129,13 @@ hypergrid$all <-  lapply(hypergrid$s.pv, checkall)
 hypergrid$s.pv<-as.character(hypergrid$s.pv)
 
 # Pick significant models
+# some= returns models runs that have at least one significant covariate p<=0.05
+# all=  returns models runs where all covariates are significant at p<=0.05
 if (all==TRUE) {
   hypergrid <- hypergrid %>% filter(all==TRUE) %>% as.data.frame() %>% drop_columns(c("all", "some")) 
 } else if (all==FALSE){
   hypergrid <- hypergrid %>% filter(some==TRUE) %>% as.data.frame() %>% drop_columns(c("all", "some"))
 } else {message("All or some function not working")}
-# hypergrid <- hypergrid %>% filter(some==TRUE)
-#hypergrid <- hypergrid %>% filter(all==TRUE) %>% as.data.frame() %>% drop_columns(c("all", "some"))
 
 hypergrid<-as.data.frame(hypergrid,stringsAsFactors = F)
 hypergrid<-hypergrid[ , !names(hypergrid) %in% c("model")]
