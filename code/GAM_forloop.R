@@ -4,6 +4,10 @@ pacman::p_load(here, readxl,lubridate,stats,graphics,Hmisc,data.table,utils,mgcv
 
 
 ####Notes (READ ME:)####
+#targets <- c("Name_of_dependent_var_column")  #target (dependent variable column name in df). can write more than one, separated by commas
+#predictors <- colnames(df_containing_cols_ofall_vars)[!(colnames(df_containing_cols_ofall_vars) %in% c("Name_of_dependent_var_column", "Year"))] #Predictors = independent variables of interest. Writes all names except those specified in "%in% c("Name_of_dependent_var_column", "Year")" section
+#correlated_vars<-c("ind_var1","ind_var2","ind_var3",...) #list which variables have correlations/ you don't want them run in the same model iteration (which ones can't be run together will be specified in function parameters, this is just a list of all column names applicable)
+
 ## Description of parameters
 #' @param  Edata The Data going into the model; data frame containing both the independent and dependent data, each variable in a separate column by year as rows
 #' @param  k    number of knots (k) in GAM. e.g parameter defined as k="k=10" with quotes
@@ -16,7 +20,7 @@ pacman::p_load(here, readxl,lubridate,stats,graphics,Hmisc,data.table,utils,mgcv
 #' @param  number_vars_in_mod Maximum number of covariates to include in any model run.e.g. if you have 6 environmental covariates to test, but only want a maximum of 4 included in model, can use: number_vars_in_mod = (length(predictors)-2))
 
 ####Function:####
-GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,folder_name,familyXYZ,number_vars_in_mod){
+GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars3,correlated_vars4,correlated_vars5,correlated_vars6,correlated_vars7,correlated_vars8,folder_name,familyXYZ,number_vars_in_mod){
   
   #create all combinations of predictors
   predictor_combinations <- lapply(1:number_vars_in_mod, FUN = function(x){
@@ -58,6 +62,10 @@ GAM_LOOP_FUN<-function(Edata,k,correlated_vars1,correlated_vars2,correlated_vars
   if(correlated_vars5!="NA"||correlated_vars6!="NA"){
     predictor_combinations <- as.data.frame(predictor_combinations)
     predictor_combinations <-predictor_combinations[!grepl(correlated_vars5, predictor_combinations$predictor_combinations)| !grepl(correlated_vars6,predictor_combinations$predictor_combinations),]  
+  }
+  if(correlated_vars7!="NA"||correlated_vars8!="NA"){
+    predictor_combinations <- as.data.frame(predictor_combinations)
+    predictor_combinations <-predictor_combinations[!grepl(correlated_vars7, predictor_combinations$predictor_combinations)| !grepl(correlated_vars8,predictor_combinations$predictor_combinations),]  
   }
   #create folder to save results to
   if(!dir.exists("data/trial_results")){
@@ -129,8 +137,8 @@ hypergrid$all <-  lapply(hypergrid$s.pv, checkall)
 hypergrid$s.pv<-as.character(hypergrid$s.pv)
 
 # Pick significant models
-# some= returns models runs that have at least one significant covariate p<=0.05
-# all=  returns models runs where all covariates are significant at p<=0.05
+# all=FALSE returns models runs that have at least one significant covariate p<=0.05
+# all=TRUE  returns models runs where all covariates are significant at p<=0.05
 if (all==TRUE) {
   hypergrid <- hypergrid %>% filter(all==TRUE) %>% as.data.frame() %>% drop_columns(c("all", "some")) 
 } else if (all==FALSE){
@@ -141,3 +149,13 @@ hypergrid<-as.data.frame(hypergrid,stringsAsFactors = F)
 hypergrid<-hypergrid[ , !names(hypergrid) %in% c("model")]
 .GlobalEnv$hypergrid <- hypergrid
 }
+
+
+
+### An example function setup###
+#targets <- c("depth_Fall")  #target (dependent variable column name in df). can write more than one, separated by commas
+#predictors <- colnames(Fall_distribution.df)[!(colnames(Fall_distribution.df) %in% c("depth_Fall","Lat_Fall", "Year"))] #Predictors = independent variables of interest
+#correlated_vars<-c("Annual_os_bt_anomaly","month6_bt_anomaly","GSI6","GSI12","NAO12","NAO6","AMO6","AMO12") #list which variables have correlations/ you don't want them run in the same model iteration (which ones can't be run together will be specified in function parameters, this is just a list of all column names applicable)
+
+#GAM_LOOP_FUN(Edata=Fall_distribution.df,k="k=8",correlated_vars1=correlated_vars[1],correlated_vars2=correlated_vars[2],correlated_vars3=correlated_vars[3],correlated_vars4=correlated_vars[4],correlated_vars5=correlated_vars[5],correlated_vars6=correlated_vars[6],correlated_vars7=correlated_vars[7],correlated_vars8=correlated_vars[8],folder_name="plaice_fall_depth",familyXYZ= "family=tw()",number_vars_in_mod = (length(predictors))) #example of function with all parameters specified
+#all_hypergrid<-allorsome(all=TRUE) 
