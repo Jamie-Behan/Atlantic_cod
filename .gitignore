@@ -27,6 +27,9 @@ vignettes/*.pdf
 # old recruitment attempt
 code/cod_recruitment.R
 
+# opening .nc data (hubert's data)
+code/open.nc_data_example_temperature.R
+
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
 
@@ -56,6 +59,9 @@ Figures/
 # RMarkdown folder
 RMarkdown/
 
+# Bycatch folder
+Bycatch/
+
 # presentations folder
 presentations/
 
@@ -70,3 +76,7 @@ code/Friedland_vs_Hubert.R
 
 # Stock surevy area overlap figure code
 code/Stock_area_survey_overlap.R
+
+Scheffer et al. 2009-changepoint.PDF
+Spatio-Temporal Dynamics of Atlantic Cod Bycatch in the Maine Lob.pdf
+Sugiharaetal-casuality.pdf
