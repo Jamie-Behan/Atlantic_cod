@@ -74,17 +74,17 @@ legend(2005, 42.8, legend=c("All Stock Areas: Adult","DisMAP all Ages & Areas", 
 layout(matrix(1:2, ncol=2, byrow=FALSE))
 par(mar=c(4.1,4.5,1.5,1), oma=c(1.0,0,1.0,0.1))
 
-plot(COG_depth_fall ~ Year, data=Cod_distribution, main="Mean Fall Depth of Cod Occurance Overtime", xlab="Year",ylab="Mean Depth (m)", type="l",lwd=3,col="#00608A",ylim= c(130,85), cex.lab=1.4,cex.axis=1.1)
+plot(COG_depth_fall ~ Year, data=Cod_distribution, main="Mean Depth of Cod Occurance Overtime", xlab="Year",ylab="Mean Depth (m)", type="l",lwd=3,col="#00608A",ylim= c(130,85), cex.lab=1.4,cex.axis=1.1)
 
 lines(COG_depth_spring ~ Year, data=Cod_distribution, xlab="Year", type="l",col="#EA4F12",lwd=3)
 
 legend("bottomright",inset = 0.03, legend=c("Fall", "Spring"),
-       col=c("#00608A","#EA4F12"), lty=1,lwd=3, cex=0.9)
+       col=c("#00608A","#EA4F12"), lty=1,lwd=3, cex=0.9, title = "Season")
 
 #####PLOT spring fall DISMAP latitude#####
-plot(COG_Lat_fall ~ Year, data=Cod_distribution, main="Mean Fall Latitude of Cod Occurance Overtime", xlab="Year",ylab="Mean Latitude (°)", type="l",lwd=3,col="#00608A",ylim= c(41.8,42.7), cex.lab=1.4,cex.axis=1.1)
+plot(COG_Lat_fall ~ Year, data=Cod_distribution, main="Mean Latitude of Cod Occurance Overtime", xlab="Year",ylab="Mean Latitude (°)", type="l",lwd=3,col="#00608A",ylim= c(41.8,42.7), cex.lab=1.4,cex.axis=1.1)
 
 lines(COG_Lat_spring ~ Year, data=Cod_distribution, xlab="Year", type="l",col="#EA4F12",lwd=3)
 
 legend("bottomright",inset = 0.03, legend=c("Fall", "Spring"),
-       col=c("#00608A","#EA4F12"), lty=1,lwd=3, cex=0.9)
+       col=c("#00608A","#EA4F12"), lty=1,lwd=3, cex=0.9, title = "Season")
